@@ -1,4 +1,5 @@
 import metrics as me
+from scipy import stats
 # import figure as fig
 import configparser
 
@@ -19,4 +20,27 @@ def compare_each_metrics():
 
     # fig.compare_metrics(filename=)
 
-compare_each_metrics()
+def ks_2samp(m1, m2):
+    ks_result = stats.ks_2samp(m1, m2)
+    print(ks_result.pvalue)
+    # print(stats.ks_2samp(m1, m2))
+
+
+
+
+def compare_two_versions(version1, version2):
+    metrics = ['pd1','pd2','pd3','pd4','pd5','pd6','pc1','pc2','pc3','pc4']
+    for m in metrics:
+        print(m+': ',end='')
+        m1 = version1.mrg_df[m]
+        m2 = version2.mrg_df[m]
+        ks_2samp(m1, m2)
+
+# compare_each_metrics()
+
+version1 = me.Metrics_Derby('10.8', METRICS_DIR)
+version2 = me.Metrics_Derby('10.9', METRICS_DIR)
+version3 = me.Metrics_Derby('10.10', METRICS_DIR)
+compare_two_versions(version1,version2)
+# compare_two_versions(version1,version3)
+compare_two_versions(version2,version3)
