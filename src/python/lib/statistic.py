@@ -17,9 +17,10 @@ ENV = inifile.get('env', 'locale')
 METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/JR/metrics-data/Apache-Derby'
 EXECUTION_MODE = inifile.get('env', 'mode')
 
-args = sys.argv
-v1 = args[1]
-v2 = args[2]
+# args = sys.argv
+# v1 = args[1]
+# v2 = args[2]
+
 
 # バージョンのメトリクスを比較する
 def compare_each_metrics():
