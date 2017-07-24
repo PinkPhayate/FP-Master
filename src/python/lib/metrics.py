@@ -39,6 +39,9 @@ class Metrics_Derby:
         df = pd.concat([self.mrg_df, self.fault], axis=1)
         df.to_csv("export_metrics" + self.version + ".csv")
 
+    def get_alike_df(self, alike_metrics):
+        return self.mrg_df[alike_metrics]
+
 class Metrics_Adam:
     def __init__(self,version):
         METRICS_DIR = "/Users/"+ENV+"/Dropbox/STUDY/JR/metrics-data/Adam"
