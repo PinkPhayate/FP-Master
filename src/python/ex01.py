@@ -12,7 +12,7 @@ inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
 # METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/JR/metrics-data/Apache-Derby'
-METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Derby/all'
+
 EXECUTION_MODE = inifile.get('env', 'mode')
 TARGET = ''
 
@@ -20,15 +20,16 @@ args = sys.argv
 ITER = int(args[2]) if (len(args)>2) else (2000)
 
 def predict(ver, predict_ver,  alike_metrics):
-    global TARGET
-    if TARGET == 'Derby':
-        #  Apache-Derby
-        training_m = Metrics_Origin(ver, METRICS_DIR)
-        evaluate_m = Metrics_Origin(predict_ver, METRICS_DIR)
-    else:
-        # NO SERVUCE
-        return
+    # if TARGET == 'Derby':
+    #     #  Apache-Derby
+    #     training_m = Metrics_Origin(ver, METRICS_DIR)
+    #     evaluate_m = Metrics_Origin(predict_ver, METRICS_DIR)
+    # else:
+    #     # NO SERVUCE
+    #     return
 
+    training_m = Metrics_Origin(ver, METRICS_DIR)
+    evaluate_m = Metrics_Origin(predict_ver, METRICS_DIR)
     # initialize
     acum_rfn_value=0
     acum_intel_value=0
@@ -60,22 +61,54 @@ def predict(ver, predict_ver,  alike_metrics):
     print(acum_intel_value/ITER)
 
 
+def exp_derby():
+    version1 = Metrics_Origin('4.1.0', METRICS_DIR)
+    version2 = Metrics_Origin('4.2.0', METRICS_DIR)
+    version3 = Metrics_Origin('10.10', METRICS_DIR)
+    print('4.1.0-4.2.0')
+    alike_metrics = st.compare_two_versions(version1,version2)
+    print(alike_metrics)
+    predict('4.1.0', '4.2.0', alike_metrics)
+    print('4.1.0-10.10')
+    alike_metrics = st.compare_two_versions(version1,version3)
+    print(alike_metrics)
+    predict('4.1.0', '10.10', alike_metrics)
+    print('4.2.0-10.10')
+    alike_metrics = st.compare_two_versions(version2,version3)
+    print(alike_metrics)
+    predict('4.2.0', '10.10', alike_metrics)
+
+def exp_solr():
+    version1 = Metrics_Origin('4.1.0', METRICS_DIR)
+    version2 = Metrics_Origin('4.2.0', METRICS_DIR)
+    version3 = Metrics_Origin('4.3.0', METRICS_DIR)
+    version3 = Metrics_Origin('4.4.0', METRICS_DIR)
+    version3 = Metrics_Origin('4.5.0', METRICS_DIR)
+    print('4.1.0-4.2.0')
+    alike_metrics = st.compare_two_versions(version1,version2)
+    print(alike_metrics)
+    predict('4.1.0', '4.2.0', alike_metrics)
+
+    print('4.2.0-4.3.0')
+    alike_metrics = st.compare_two_versions(version1,version3)
+    print(alike_metrics)
+    predict('4.2.0', '4.3.0', alike_metrics)
+
+    print('4.3.0-4.4.0')
+    alike_metrics = st.compare_two_versions(version2,version3)
+    print(alike_metrics)
+    predict('4.3.0', '4.4.0', alike_metrics)
+
+    print('4.4.0-4.5.0')
+    alike_metrics = st.compare_two_versions(version2,version3)
+    print(alike_metrics)
+    predict('4.4.0', '4.5.0', alike_metrics)
 
 if args[1] == "derby":
     TARGET = 'Derby'
-
-version1 = Metrics_Origin('10.8', METRICS_DIR)
-version2 = Metrics_Origin('10.9', METRICS_DIR)
-version3 = Metrics_Origin('10.10', METRICS_DIR)
-print('10.8-10.9')
-alike_metrics = st.compare_two_versions(version1,version2)
-print(alike_metrics)
-predict('10.8', '10.9', alike_metrics)
-print('10.8-10.10')
-alike_metrics = st.compare_two_versions(version1,version3)
-print(alike_metrics)
-predict('10.8', '10.10', alike_metrics)
-print('10.9-10.10')
-alike_metrics = st.compare_two_versions(version2,version3)
-print(alike_metrics)
-predict('10.9', '10.10', alike_metrics)
+    METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Derby/all'
+    exp_derby()
+if args[1] == "solr":
+    TARGET = 'Solr'
+    METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Solr/all'
+    exp_solr()
