@@ -89,6 +89,7 @@ def exp_solr():
     exp('4.3.0', '4.4.0')
     exp('4.4.0', '4.5.0')
 
+print('TARGET')
 if args[1] == "derby":
     TARGET = 'Derby'
     METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Derby/all'
