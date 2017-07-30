@@ -1,6 +1,6 @@
 import matplotlib.pyplot as plt
 
-def figure_derby():
+def figure_solr():
     X1 = [1,2,3,4]
     Y1 = [0.627066392,0.757069534,0.727960388,0.801059877]
 
@@ -8,7 +8,7 @@ def figure_derby():
     Y2 = [0.637995736,0.701957394,0.672059443,0.752041112]
 
     plt.bar(X1, Y1, color='#C0C0C0', width=0.4, label='RFN', align="center")
-    plt.bar(X2, Y2, color='#FF5B70', width=0.4, label='ITG', align="center")
+    plt.bar(X2, Y2, color='#5b70ff', width=0.4, label='ITG', align="center")
 
     # 凡例を表示
     plt.legend(loc="best")
@@ -18,7 +18,7 @@ def figure_derby():
     plt.show()
 
 
-def solr():
+def figure_derby():
     X1 = [1,2]
     Y1 = [0.886224864,0.828833024]
 
@@ -26,7 +26,7 @@ def solr():
     Y2 = [0.884751282,0.844780548]
 
     plt.bar(X1, Y1, color='#C0C0C0', width=0.4, label='RFN', align="center")
-    plt.bar(X2, Y2, color='#FF5B70', width=0.4, label='ITG', align="center")
+    plt.bar(X2, Y2, color='#5b70ff', width=0.4, label='ITG', align="center")
 
     # 凡例を表示
     plt.legend(loc="best")
