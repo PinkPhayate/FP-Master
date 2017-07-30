@@ -89,12 +89,13 @@ def exp_solr():
     exp('4.3.0', '4.4.0')
     exp('4.4.0', '4.5.0')
 
-print('TARGET')
-if args[1] == "derby":
-    TARGET = 'Derby'
-    METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Derby/all'
-    exp_derby()
-if args[1] == "solr":
-    TARGET = 'Solr'
-    METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Solr/all'
-    exp_solr()
+if __name__ == '__main__':
+    print('TARGET')
+    if args[1] == "derby":
+        TARGET = 'Derby'
+        METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Derby/all'
+        exp_derby()
+    if args[1] == "solr":
+        TARGET = 'Solr'
+        METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Solr/all'
+        exp_solr()

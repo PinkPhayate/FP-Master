@@ -52,6 +52,7 @@ def compare_two_versions(version1, version2):
         m1 = version1.mrg_df[m]
         m2 = version2.mrg_df[m]
         pvalue = ks_2samp(m1, m2)
+        print(str(pvalue)+', ', end='')
         if (THRESOLD < pvalue):
             alike_metrics.append(m)
     return alike_metrics
