@@ -16,9 +16,6 @@ class Fopt(object):
         sorted_df = df.sort_values(by='actual',ascending=False)
         # accum_fault_actual = self.calculate_auc(sorted_df['actual','loc'])
 
-    def calculate_auc(df):
-        df[['accum']] = calculate_accum_fault(df['actual'])
-
     def calculate_accum_fault(self, df):
         ac = 0
         list = []
@@ -28,3 +25,11 @@ class Fopt(object):
             list.append(ac)
         df['accum_fault'] = pd.DataFrame(list)
         return df
+
+    def calculate_auc(self, accums, line_df):
+        S = 0
+        total_line = line_df.sum()
+        line_df = line_df / total_line[0]
+        df = pd.concat([accums, line_df], axis=1)
+        d = df.apply(lambda x: x[0] * x[1])
+        return d.sum()
