@@ -14,7 +14,13 @@ def train_rf (ev_data, dv_data):
     # normalize
     # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
 
-    model = RandomForestClassifier()
+    model = RandomForestClassifier(
+        oob_score=True,
+        class_weight='balanced',
+        max_depth=3,
+        n_estimators=100,
+        min_samples_leaf=3
+    )
     model.fit(ev_data, column_or_1d(dv_data))
 
     return model
