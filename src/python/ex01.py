@@ -2,6 +2,7 @@
 from lib.metrics import Metrics_Origin
 from lib import statistic as st
 from lib import ex_randf as rf
+from lib.predictor import RFPredictor
 import configparser
 import sys
 import random
@@ -40,22 +41,29 @@ def predict(ver, predict_ver,  alike_metrics):
             print('iteration: ' +str(i))
 
         # NML MODEL
+        rf = RFPredictor(predict_ver, ver, 'NML')
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
         nml_value, importance = rf.predict_rf_saver(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
         acum_nml_value += nml_value
+        rf.set_is_new_df(evaluate_m.isNew)
+        rf.export_report()
         # diagram_list.append(rfn_value)
 
         # RFN MODEL
+        rf = RFPredictor(predict_ver, ver, 'RFN')
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
         rfn_value, importance = rf.predict_rf_saver(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
         acum_rfn_value += rfn_value
+        rf.set_is_new_df(evaluate_m.isNew)
+        rf.export_report()
         # diagram_list.append(rfn_value)
 
         # INTELLIGENCE MODEL
+        rf = RFPredictor(predict_ver, ver, 'ITG')
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         alike_df = training_m.get_specific_df(alike_metrics)
         X_resampled, y_resampled = sm.fit_sample( alike_df, training_m.fault )
@@ -63,6 +71,8 @@ def predict(ver, predict_ver,  alike_metrics):
         alike_df = evaluate_m.get_specific_df(alike_metrics)
         rfn_value, importance = rf.predict_rf_saver(model, alike_df, evaluate_m.fault, TARGET + "-ex1itg.csv")
         acum_intel_value += rfn_value
+        rf.set_is_new_df(evaluate_m.isNew)
+        rf.export_report()
         # diagram_list.append(rfn_value)
 
     print(acum_nml_value/ITER)

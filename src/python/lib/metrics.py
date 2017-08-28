@@ -18,6 +18,7 @@ class Metrics_Origin(object):
         self.mrg_df = pd.concat([self.product_df, self.process_df], axis=1)
         self.faults = df[8]
         self.fault = self.faults.apply(lambda x: 1 if 0 < x else 0)
+        self.isNew = df.ix[:, 3]
         self.__name_columns()
 
     def put_metrics(self, df):
@@ -33,6 +34,7 @@ class Metrics_Origin(object):
         self.process_df.columns = ['pc1','pc2','pc3','pc4']
         self.product_df.columns = ['pd1','pd2','pd3','pd4','pd5','pd6']
         self.fault.columns = ['fault']
+        self.isNew.columns = ['isNew']
 
     def export_df(self):
         df = pd.concat([self.mrg_df, self.fault], axis=1)
