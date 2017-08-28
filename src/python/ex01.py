@@ -43,7 +43,7 @@ def predict(ver, predict_ver,  alike_metrics):
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
-        nml_value, importance = rf.predict_rf_saver(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
+        nml_value, importance = rf.predict_rf_saver(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
         acum_nml_value += nml_value
         # diagram_list.append(rfn_value)
 
@@ -61,7 +61,7 @@ def predict(ver, predict_ver,  alike_metrics):
         X_resampled, y_resampled = sm.fit_sample( alike_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
         alike_df = evaluate_m.get_specific_df(alike_metrics)
-        rfn_value, importance = rf.predict_rf_saver(model, alike_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
+        rfn_value, importance = rf.predict_rf_saver(model, alike_df, evaluate_m.fault, TARGET + "-ex1itg.csv")
         acum_intel_value += rfn_value
         # diagram_list.append(rfn_value)
 
