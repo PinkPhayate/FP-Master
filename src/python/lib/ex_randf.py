@@ -9,6 +9,8 @@ import configparser
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 EXECUTION_MODE = inifile.get('env', 'mode')
+ENV = inifile.get('env', 'locale')
+METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
 
 def train_rf (ev_data, dv_data):
     # normalize
@@ -41,20 +43,26 @@ def predict_rf_saver(model, ev_data, dv_data, filename):
     # normalize
     # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
     output = model.predict_proba(ev_data)
-    ev_data = pd.concat([paramater, dv_data],axis=1)
-    actual = pd.DataFrame(output).ix[:,1:]
-    actual.columns = [[ 'predict']]
-    df = pd.concat([paramater, actual],axis=1)
+    # ev_data = pd.concat([paramater, dv_data],axis=1)
+    predict = pd.DataFrame(output).ix[:,1:]
+    predict.columns = [['predict']]
+    df = pd.concat([paramater, predict],axis=1)
+    dv_data.columns = [['actual']]
+    df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
+    df['predict'] = df.apply(lambda x: float(x['predict']), axis=1)
+    # df['predict'] = df[['predict']].apply(lambda x: float(x.values[0]))
     df =df.sort_values(by='predict',ascending=False)
+    print(df)
+
     importance = pd.DataFrame(model.feature_importances_)
     # importance
-    if EXECUTION_MODE == 'debug':
+    if EXECUTION_MODE == 'Investigation':
         # print(importance)
-        df = pd.concat([df, importance], axis=0)
-        df.to_csv("../Data/Research/Investigation/"+filename)
-        return calculate_diagram_saver(dv_data, actual, filename), model.feature_importances_
+        # df = pd.concat([df, importance], axis=0)
+        df.to_csv(METRICS_DIR+filename)
+        return calculate_auc_score(dv_data, predict), model.feature_importances_
     else:
-        return calculate_auc_score(dv_data, actual), model.feature_importances_
+        return calculate_auc_score(dv_data, predict), model.feature_importances_
         # return calculate_diagram(dv_data, actual), model.feature_importances_
 
 
