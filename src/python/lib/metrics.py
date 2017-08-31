@@ -41,6 +41,11 @@ class Metrics_Origin(object):
     def get_specific_df(self, specific_metrics):
         return self.mrg_df[specific_metrics]
 
+    def set_prob_value(self, df):
+        if len(df) == 1:
+            self.prob = df
+        else:
+            raise AttributeError
 
 
 # class Metrics_Derby:

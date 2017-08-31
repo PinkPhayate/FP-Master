@@ -20,6 +20,14 @@ def train_rf (ev_data, dv_data):
     return model
 
 def predict_rf(model, ev_data, dv_data):
+    paramater = ev_data.copy()
+    # normalize
+    # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+    output = model.predict_proba(ev_data)
+    actual = pd.DataFrame(output).ix[:, 1:]
+    actual.columns = [['predict']]
+    return actual
+
 
     # normalize
     # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
@@ -28,6 +36,8 @@ def predict_rf(model, ev_data, dv_data):
     pred = pd.DataFrame( output ).ix[:,1:1]
     print(model.feature_importances_)
     return calculate_diagram(dv_data, pred)
+
+
 
 def predict_rf_saver(model, ev_data, dv_data, filename):
     # save for write file about metrics and predict and actualy
