@@ -86,13 +86,20 @@ class Predictor(object):
 
     def set_is_new_df(self, df):
         self.is_new_df = df
+        self.is_new_df.columns = ['isNew']
 
-    def export_report(self):
+    def set_is_modified_df(self, df):
+        self.is_modified_df = df
+        self.is_modified_df.columns = ['isModified']
+
+    def export_report(self, version):
         if self.is_new_df is not None and\
+            self.is_modified_df is not None and\
             self.report_df is not None:
             __report_df = pd.concat([self.report_df, self.is_new_df], axis=1)
-            __report_df = __report_df.sort_values(by='predict', ascending=False)
-            __report_df.to_csv(METRICS_DIR + self.model_type + '-report.csv')
+            __report_df = pd.concat([self.report_df, self.is_modified_df], axis=1)
+            # __report_df = __report_df.sort_values(by='predict', ascending=False)
+            __report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
 
 class RFPredictor(Predictor):
     def __init__(self, pv, v, model_type):

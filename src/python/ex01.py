@@ -36,6 +36,10 @@ def predict(ver, predict_ver,  alike_metrics):
     acum_rfn_value=0
     acum_intel_value=0
 
+    # acum_nml_report= pd.DataFrme([])
+    # acum_rfn_report= pd.DataFrme([])
+    # acum_intel_report= pd.DataFrme([])
+
     for i in range(ITER):
         if i%500 == 0:
             print('iteration: ' +str(i))
@@ -48,8 +52,9 @@ def predict(ver, predict_ver,  alike_metrics):
         nml_value, importance = rf.predict_rf_saver(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
         acum_nml_value += nml_value
         rf.set_is_new_df(evaluate_m.isNew)
-        rf.export_report()
-        # diagram_list.append(rfn_value)
+        rf.set_is_modified_df(evaluate_m.isModified)
+        report = rf.export_report(predict_ver)
+
 
         # RFN MODEL
         rf = RFPredictor(predict_ver, ver, 'RFN')
@@ -59,7 +64,9 @@ def predict(ver, predict_ver,  alike_metrics):
         rfn_value, importance = rf.predict_rf_saver(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
         acum_rfn_value += rfn_value
         rf.set_is_new_df(evaluate_m.isNew)
-        rf.export_report()
+        rf.set_is_modified_df(evaluate_m.isModified)
+        report = rf.export_report(predict_ver)
+        # acum_rfn_report += report
         # diagram_list.append(rfn_value)
 
         # INTELLIGENCE MODEL
@@ -72,8 +79,11 @@ def predict(ver, predict_ver,  alike_metrics):
         rfn_value, importance = rf.predict_rf_saver(model, alike_df, evaluate_m.fault, TARGET + "-ex1itg.csv")
         acum_intel_value += rfn_value
         rf.set_is_new_df(evaluate_m.isNew)
-        rf.export_report()
+        rf.set_is_modified_df(evaluate_m.isModified)
+        report = rf.export_report(predict_ver)
+        # acum_itg_report += report
         # diagram_list.append(rfn_value)
+
 
     print(acum_nml_value/ITER)
     print(acum_rfn_value/ITER)

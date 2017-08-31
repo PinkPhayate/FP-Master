@@ -19,6 +19,7 @@ class Metrics_Origin(object):
         self.faults = df[8]
         self.fault = self.faults.apply(lambda x: 1 if 0 < x else 0)
         self.isNew = df.ix[:, 3]
+        self.__consider_modification()
         self.__name_columns()
 
     def put_metrics(self, df):
@@ -42,6 +43,11 @@ class Metrics_Origin(object):
 
     def get_specific_df(self, specific_metrics):
         return self.mrg_df[specific_metrics]
+
+    def __consider_modification(self):
+        # sum_df = self.process_df[self.process_df.sum(axis=1)]
+        self.isModified = self.process_df.apply(lambda x: 1 if 0<x.sum() else 0)
+        self.isModified.columns = ['isModified']
 
 
 
