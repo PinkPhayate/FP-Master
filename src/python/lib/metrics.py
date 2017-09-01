@@ -36,6 +36,7 @@ class Metrics_Origin(object):
         self.product_df.columns = ['pd1','pd2','pd3','pd4','pd5','pd6']
         self.fault.columns = ['fault']
         self.isNew.columns = ['isNew']
+        self.isModified.columns = ['isModified']
 
     def export_df(self):
         df = pd.concat([self.mrg_df, self.fault], axis=1)
@@ -46,8 +47,8 @@ class Metrics_Origin(object):
 
     def __consider_modification(self):
         # sum_df = self.process_df[self.process_df.sum(axis=1)]
-        self.isModified = self.process_df.apply(lambda x: 1 if 0<x.sum() else 0)
-        self.isModified.columns = ['isModified']
+        self.isModified = self.process_df.apply(
+            lambda x: 1 if 0 < x.sum() else 0, axis=1)
 
 
 

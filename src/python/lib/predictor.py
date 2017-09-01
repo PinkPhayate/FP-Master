@@ -11,7 +11,6 @@ inifile.read('./config.ini')
 EXECUTION_MODE = inifile.get('env', 'mode')
 ENV = inifile.get('env', 'locale')
 METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
-
 class Predictor(object):
     model_type = None
     is_new_df = None
@@ -85,21 +84,23 @@ class Predictor(object):
         return diagram_value
 
     def set_is_new_df(self, df):
-        self.is_new_df = df
+        self.is_new_df = pd.DataFrame(df)
         self.is_new_df.columns = ['isNew']
 
     def set_is_modified_df(self, df):
-        self.is_modified_df = df
+        self.is_modified_df = pd.DataFrame(df)
         self.is_modified_df.columns = ['isModified']
 
     def export_report(self, version):
         if self.is_new_df is not None and\
             self.is_modified_df is not None and\
             self.report_df is not None:
-            __report_df = pd.concat([self.report_df, self.is_new_df], axis=1)
-            __report_df = pd.concat([self.report_df, self.is_modified_df], axis=1)
+            self.report_df = pd.concat([self.report_df, self.is_new_df], axis=1)
+            self.report_df = pd.concat([self.report_df, self.is_modified_df], axis=1)
             # __report_df = __report_df.sort_values(by='predict', ascending=False)
-            __report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
+                #  self.report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
+            return self.report_df
+
 
 class RFPredictor(Predictor):
     def __init__(self, pv, v, model_type):

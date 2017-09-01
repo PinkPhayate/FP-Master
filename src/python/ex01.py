@@ -7,7 +7,8 @@ import configparser
 import sys
 import random
 from imblearn.over_sampling import RandomOverSampler
-
+from lib.report_analyzer import Analyzer
+REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
 # set environment lab or home
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
@@ -19,6 +20,9 @@ TARGET = ''
 
 args = sys.argv
 ITER = int(args[2]) if (len(args)>2) else (2000)
+
+def analyze_report(report_df):
+    analyzer.analyze()
 
 def predict(ver, predict_ver,  alike_metrics):
     # if TARGET == 'Derby':
@@ -35,6 +39,11 @@ def predict(ver, predict_ver,  alike_metrics):
     acum_nml_value=0
     acum_rfn_value=0
     acum_intel_value=0
+
+    nml_analyzer = Analyzer(predict_ver, 'NML')
+    rfn_analyzer = Analyzer(predict_ver, 'RFN')
+    itg_analyzer = Analyzer(predict_ver, 'ITG')
+
 
     # acum_nml_report= pd.DataFrme([])
     # acum_rfn_report= pd.DataFrme([])
@@ -53,7 +62,11 @@ def predict(ver, predict_ver,  alike_metrics):
         acum_nml_value += nml_value
         rf.set_is_new_df(evaluate_m.isNew)
         rf.set_is_modified_df(evaluate_m.isModified)
-        report = rf.export_report(predict_ver)
+        report_df = rf.export_report(predict_ver)
+        if report_df is not None:
+            nml_analyzer.set_report_df(report_df[REPORT_COLUMNS])
+            nml_analyzer.calculate()
+
 
 
         # RFN MODEL
@@ -65,9 +78,10 @@ def predict(ver, predict_ver,  alike_metrics):
         acum_rfn_value += rfn_value
         rf.set_is_new_df(evaluate_m.isNew)
         rf.set_is_modified_df(evaluate_m.isModified)
-        report = rf.export_report(predict_ver)
-        # acum_rfn_report += report
-        # diagram_list.append(rfn_value)
+        report_df = rf.export_report(predict_ver)
+        if report_df is not None:
+            rfn_analyzer.set_report_df(report_df[REPORT_COLUMNS])
+            rfn_analyzer.calculate()
 
         # INTELLIGENCE MODEL
         rf = RFPredictor(predict_ver, ver, 'ITG')
@@ -80,14 +94,15 @@ def predict(ver, predict_ver,  alike_metrics):
         acum_intel_value += rfn_value
         rf.set_is_new_df(evaluate_m.isNew)
         rf.set_is_modified_df(evaluate_m.isModified)
-        report = rf.export_report(predict_ver)
-        # acum_itg_report += report
-        # diagram_list.append(rfn_value)
+        report_df = rf.export_report(predict_ver)
+        if report_df is not None:
+            itg_analyzer.set_report_df(report_df[REPORT_COLUMNS])
+            itg_analyzer.calculate()
 
-
-    print(acum_nml_value/ITER)
-    print(acum_rfn_value/ITER)
-    print(acum_intel_value/ITER)
+    # export report
+    nml_analyzer.calculate_average(ITER)
+    rfn_analyzer.calculate_average(ITER)
+    itg_analyzer.calculate_average(ITER)
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)
