@@ -61,7 +61,7 @@ class Analyzer(object):
         __df = self.report_df[self.report_df.apply(
             lambda x: x['actual'] == 1, axis=1)]
         total_num = len(__df)
-        new_mods = __df.apply(lambda x: x['isNew'] == 1, axis=1)
+        new_mods = __df[__df.apply(lambda x: x['isNew'] == 1, axis=1)]
         new_num = len(new_mods)
         value = new_num / float(total_num)
         rep_msg = "[report] value01: {}".format(value)
