@@ -12,11 +12,12 @@ class Metrics_Origin(object):
         self.process_df = df.ix[:, 4:7]
         self.process_df.columns = ['pc1','pc2','pc3','pc4']
 
-        self.product_df = df.ix[:, 11:16]
+        self.product_df = df.ix[:, 12:17]
         self.product_df.columns = ['pd1','pd2','pd3','pd4','pd5','pd6']
 
         self.mrg_df = pd.concat([self.product_df, self.process_df], axis=1)
-        self.faults = df[8]
+        self.faults = df.ix[:, 9]
+        self.loc = df.ix[:, 8]
         self.fault = self.faults.apply(lambda x: 1 if 0 < x else 0)
         self.isNew = df.ix[:, 3]
         self.__consider_modification()
