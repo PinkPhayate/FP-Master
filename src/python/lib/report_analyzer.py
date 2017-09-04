@@ -96,21 +96,28 @@ class Analyzer(object):
         return diagram_value
 
     def calculate_average(self, iter_num):
+        df = pd.DataFrame([self.model_type, self.predict_version])
         itnm = float(iter_num)
         print('model: {}, version: {}'.format(
             self.model_type, self.predict_version))
         s = sum(self.accum_val0)
         msg = "[report] value0: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['value0', s/itnm])], axis=1)
         print(msg)
         s = sum(self.accum_val1)
         msg = "[report] value1: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['value1', s/itnm])], axis=1)
         print(msg)
         s = sum(self.accum_val2)
         msg = "[report] value2: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['value2', s/itnm])], axis=1)
         print(msg)
         s = sum(self.accum_val3)
         msg = "[report] value3: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['value3', s/itnm])], axis=1)
         print(msg)
         s = sum(self.accum_val4)
         msg = "[report] value4: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['value4', s/itnm])], axis=1)
         print(msg)
+        return df

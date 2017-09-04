@@ -8,6 +8,7 @@ import sys
 import random
 from imblearn.over_sampling import RandomOverSampler
 from lib.report_analyzer import Analyzer
+import pandas as pd
 REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
 # set environment lab or home
 inifile = configparser.SafeConfigParser()
@@ -15,6 +16,7 @@ inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
 # METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/JR/metrics-data/Apache-Derby'
 
+REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
 EXECUTION_MODE = inifile.get('env', 'mode')
 TARGET = ''
 
@@ -100,9 +102,18 @@ def predict(ver, predict_ver,  alike_metrics):
             itg_analyzer.calculate()
 
     # export report
-    nml_analyzer.calculate_average(ITER)
-    rfn_analyzer.calculate_average(ITER)
-    itg_analyzer.calculate_average(ITER)
+    report_file_name = REPORT_DIR + TARGET+'-report.csv'
+    import os
+    if os.path.exists(report_file_name):
+        report_df = pd.read_csv(report_file_name,header=0, index_col=0)
+    else:
+        report_df = pd.DataFrame([])
+    nml_df = nml_analyzer.calculate_average(ITER)
+    rfn_df = rfn_analyzer.calculate_average(ITER)
+    itg_df = itg_analyzer.calculate_average(ITER)
+    df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True, axis=0)
+    report_df = pd.concat([report_df, df], axis=1, ignore_index=True,)
+    report_df.to_csv(report_file_name)
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)
