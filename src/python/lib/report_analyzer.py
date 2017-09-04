@@ -1,5 +1,12 @@
 import pandas as pd
 from lib.auc import AUC
+import sklearn.metrics as skm
+import configparser
+inifile = configparser.SafeConfigParser()
+inifile.read('./config.ini')
+ENV = inifile.get('env', 'locale')
+REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
+
 
 class Analyzer(object):
     COLUM_NAMES = ['predict', 'actual', 'isNew', 'isModified']
@@ -9,6 +16,8 @@ class Analyzer(object):
     accum_val3 = []  # 変更があったモジュールに絞ったところ、どれくらいの精度なのか
     accum_val4 = []  # 新モジュールに絞ったところ、どれくらいの精度なのか
     values_list = []
+
+
 
     def __init__(self, version, model_type):
         self.predict_version = version
@@ -24,6 +33,12 @@ class Analyzer(object):
         if self.accum_val4 is not None:
             self.accum_val4 = []
 
+    def set_report_repository(self, dir_name):
+        """
+        レポートの保存先を変えたい時に呼ぶ
+        """
+        global REPORT_DIR
+        REPORT_DIR = dir_name
 
     def set_report_df(self, report):
         self.report_df = report
@@ -121,3 +136,167 @@ class Analyzer(object):
         df = pd.concat([df, pd.DataFrame(['value4', s/itnm])], axis=1)
         print(msg)
         return df
+
+    def export(self, target_sw, df):
+        report_file_name = REPORT_DIR + target_sw+'-report.csv'
+        import os
+        if os.path.exists(report_file_name):
+            report_df = pd.read_csv(report_file_name, header=0, index_col=0)
+        else:
+            report_df = pd.DataFrame([])
+        report_df = pd.concat([report_df, df], axis=1, ignore_index=True,)
+        report_df.to_csv(report_file_name)
+
+class AUCAnalyzer(Analyzer):
+    accum_accuracy0 = []
+    accum_recall0 = []
+    accum_precision0 = []
+    accum_accuracy2 = []
+    accum_recall2 = []
+    accum_precision2 = []
+    accum_accuracy3 = []
+    accum_recall3 = []
+    accum_precision3 = []
+    accum_accuracy4 = []
+    accum_recall4 = []
+    accum_precision4 = []
+
+    def __init__(self, version, model_type):
+        self.predict_version = version
+        self.model_type = model_type
+
+        if self.accum_recall0 is not None:
+            self.accum_recall0 = []
+        if self.accum_precision0 is not None:
+            self.accum_precision0 = []
+        if self.accum_accuracy0 is not None:
+            self.accum_accuracy0 = []
+        if self.accum_recall2 is not None:
+            self.accum_recall2 = []
+        if self.accum_precision2 is not None:
+            self.accum_precision2 = []
+        if self.accum_accuracy2 is not None:
+            self.accum_accuracy2 = []
+        if self.accum_recall3 is not None:
+            self.accum_recall3 = []
+        if self.accum_precision3 is not None:
+            self.accum_precision3 = []
+        if self.accum_accuracy3 is not None:
+            self.accum_accuracy3 = []
+        if self.accum_recall4 is not None:
+            self.accum_recall4 = []
+        if self.accum_precision4 is not None:
+            self.accum_precision4 = []
+        if self.accum_accuracy4 is not None:
+            self.accum_accuracy4 = []
+
+    def calculate(self):
+        self.calculate_0()
+        self.calculate_2()
+        self.calculate_3()
+        self.calculate_4()
+
+    def calculate_2indict(self, __df):
+        recall = skm.recall_score(y_true=__df[['actual']],
+                                  y_pred=__df[['predict']])
+        accuracy = skm.accuracy_score(y_true=__df[['actual']],
+                                      y_pred=__df[['predict']])
+        precision = skm.precision_score(y_true=__df[['actual']],
+                                      y_pred=__df[['predict']])
+        return recall, accuracy, precision
+
+    def calculate_0(self):
+        __df = self.report_df.copy()
+        recall, accuracy, precision = self.calculate_2indict(__df)
+        self.accum_recall0.append(recall)
+        self.accum_accuracy0.append(accuracy)
+        self.accum_precision0.append(precision)
+
+    def calculate_2(self):
+        __df = self.report_df[self.report_df.apply(
+            lambda x: x['isModified'] == 0, axis=1)]
+        recall, accuracy, precision = self.calculate_2indict(__df)
+        self.accum_recall2.append(recall)
+        self.accum_accuracy2.append(accuracy)
+        self.accum_precision2.append(precision)
+
+    def calculate_3(self):
+        __df = self.report_df[self.report_df.apply(
+            lambda x: x['isModified'] == 1, axis=1)]
+        recall, accuracy, precision = self.calculate_2indict(__df)
+        self.accum_recall3.append(recall)
+        self.accum_accuracy3.append(accuracy)
+        self.accum_precision3.append(precision)
+
+    def calculate_4(self):
+        __df = self.report_df[self.report_df.apply(
+            lambda x: x['isNew'] == 1, axis=1)]
+        recall, accuracy, precision = self.calculate_2indict(__df)
+        self.accum_recall4.append(recall)
+        self.accum_accuracy4.append(accuracy)
+        self.accum_precision4.append(precision)
+
+    def calculate_average(self, iter_num):
+        df = pd.DataFrame([self.model_type, self.predict_version])
+        itnm = float(iter_num)
+        print('model: {}, version: {}'.format(
+            self.model_type, self.predict_version))
+        s = sum(self.accum_recall0)
+        msg = "[report] recall0: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['recall0', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_precision0)
+        msg = "[report] precision0: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['precision0', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_accuracy0)
+        msg = "[report] accuracy0: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['accuracy0', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_recall2)
+        msg = "[report] recall2: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['recall2', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_precision2)
+        msg = "[report] precision2: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['precision2', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_accuracy2)
+        msg = "[report] accuracy2: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['accuracy2', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_recall3)
+        msg = "[report] recall3: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['recall3', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_precision3)
+        msg = "[report] precision3: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['precision3', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_accuracy3)
+        msg = "[report] accuracy3: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['accuracy3', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_recall4)
+        msg = "[report] recall4: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['recall4', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_precision4)
+        msg = "[report] precision4: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['precision4', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_accuracy4)
+        msg = "[report] accuracy4: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['accuracy4', s/itnm])], axis=1)
+        print(msg)
+        return df
+
+    def export(self, target_sw, df):
+        report_file_name = REPORT_DIR + target_sw+'-aucreport.csv'
+        import os
+        if os.path.exists(report_file_name):
+            report_df = pd.read_csv(report_file_name, header=0, index_col=0)
+        else:
+            report_df = pd.DataFrame([])
+        report_df = pd.concat([report_df, df], axis=1, ignore_index=True,)
+        report_df.to_csv(report_file_name)

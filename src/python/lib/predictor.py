@@ -21,42 +21,6 @@ class Predictor(object):
         self.ver = v
         self.model_type = model_type
 
-
-    def predict_rf(self, model, ev_data, dv_data):
-
-        # normalize
-        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
-
-        output = model.predict_proba(ev_data)
-        pred = pd.DataFrame( output ).ix[:,1:1]
-        print(model.feature_importances_)
-        return self.calculate_diagram(dv_data, pred)
-
-    def predict_rf_saver(self, model, ev_data, dv_data, filename):
-        # save for write file about metrics and predict and actualy
-        paramater = ev_data.copy()
-        # normalize
-        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
-        output = model.predict_proba(ev_data)
-        # ev_data = pd.concat([paramater, dv_data],axis=1)
-        predict = pd.DataFrame(output).ix[:,1:]
-        predict.columns = [['predict']]
-        df = pd.concat([paramater, predict],axis=1)
-        dv_data.columns = [['actual']]
-        df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
-        df['predict'] = df.apply(lambda x: float(x['predict']), axis=1)
-        # df['predict'] = df[['predict']].apply(lambda x: float(x.values[0]))
-        self.report_df = df
-
-        importance = pd.DataFrame(model.feature_importances_)
-        # importance
-        if EXECUTION_MODE == 'Investigation':
-            return self.calculate_auc_score(dv_data, predict), model.feature_importances_
-        else:
-            return self.calculate_auc_score(dv_data, predict), model.feature_importances_
-            # return calculate_diagram(dv_data, actual), model.feature_importances_
-
-
     def get_random_ev(self, size):
         np.random.seed(seed=2019)
         rev = np.random.rand( size )
@@ -91,14 +55,15 @@ class Predictor(object):
         self.is_modified_df = pd.DataFrame(df)
         self.is_modified_df.columns = ['isModified']
 
-    def export_report(self, version):
+    def export_report(self, version, sorting=True):
         if self.is_new_df is not None and\
-            self.is_modified_df is not None and\
-            self.report_df is not None:
+           self.is_modified_df is not None and\
+           self.report_df is not None:
             self.report_df = pd.concat([self.report_df, self.is_new_df], axis=1)
             self.report_df = pd.concat([self.report_df, self.is_modified_df], axis=1)
-            # __report_df = __report_df.sort_values(by='predict', ascending=False)
-                #  self.report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
+            if sorting:
+                self.report_df = self.report_df.sort_values(by='predict', ascending=False)
+            self.report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
             return self.report_df
 
 
@@ -119,3 +84,78 @@ class RFPredictor(Predictor):
         model.fit(ev_data, column_or_1d(dv_data))
 
         return model
+
+    def predict_rf_saver(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        output = model.predict_proba(ev_data)
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output).ix[:,1:]
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict],axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
+        df['predict'] = df.apply(lambda x: float(x['predict']), axis=1)
+        # df['predict'] = df[['predict']].apply(lambda x: float(x.values[0]))
+        self.report_df = df
+
+        importance = pd.DataFrame(model.feature_importances_)
+        # importance
+        if EXECUTION_MODE == 'Investigation':
+            return self.calculate_auc_score(dv_data, predict), model.feature_importances_
+        else:
+            return self.calculate_auc_score(dv_data, predict), model.feature_importances_
+            # return calculate_diagram(dv_data, actual), model.feature_importances_
+
+    def predict_rf(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        output = model.predict(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict),\
+                                        model.feature_importances_
+
+class LGPredictor(Predictor):
+    def __init__(self, pv, v, model_type):
+        super(LGPredictor, self).__init__(pv, v, model_type)
+
+    def train_rf(self, ev_data, dv_data):
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        model = SGDClassifier(loss="log",
+                              penalty="l2",
+                              class_weight="balanced",
+                              n_iter=1000)
+        model.fit(ev_data, column_or_1d(dv_data))
+
+        return model
+
+    def predict_rf(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        output = model.predict(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict),\
+                                        model.feature_importances_
