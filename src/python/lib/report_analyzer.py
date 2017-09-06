@@ -148,6 +148,11 @@ class Analyzer(object):
         report_df.to_csv(report_file_name)
 
 class AUCAnalyzer(Analyzer):
+    COLUMNS = ['MODEL', 'recall0', 'precision0', 'accuracy0', 'recall2',
+               'precision2', 'accuracy2', 'recall3', 'precision3', 'accuracy3',
+               'recall4', 'precision4', 'accuracy4']
+    report_file_name = ''
+
     accum_accuracy0 = []
     accum_recall0 = []
     accum_precision0 = []
@@ -161,9 +166,11 @@ class AUCAnalyzer(Analyzer):
     accum_recall4 = []
     accum_precision4 = []
 
-    def __init__(self, version, model_type):
+    def __init__(self, version, model_type, target_sw):
         self.predict_version = version
         self.model_type = model_type
+        self.__remove_report_files()
+        self.report_file_name = REPORT_DIR + target_sw+'-aucreport.csv'
 
         if self.accum_recall0 is not None:
             self.accum_recall0 = []
@@ -189,6 +196,11 @@ class AUCAnalyzer(Analyzer):
             self.accum_precision4 = []
         if self.accum_accuracy4 is not None:
             self.accum_accuracy4 = []
+
+    def __remove_report_files(self):
+        import os
+        if os.path.exists(self.report_file_name):
+            os.remove(self.report_file_name)
 
     def calculate(self):
         self.calculate_0()
@@ -292,11 +304,14 @@ class AUCAnalyzer(Analyzer):
         return df
 
     def export(self, target_sw, df):
-        report_file_name = REPORT_DIR + target_sw+'-aucreport.csv'
+        df.columns = self.COLUMNS
+        df = df.ix[[1,3,5], :]
+        print(df)
         import os
-        if os.path.exists(report_file_name):
-            report_df = pd.read_csv(report_file_name, header=0, index_col=0)
+        if os.path.exists(self.report_file_name):
+            report_df = pd.read_csv(self.report_file_name, header=0, index_col=0)
+            report_df.columns = self.COLUMNS
         else:
             report_df = pd.DataFrame([])
-        report_df = pd.concat([report_df, df], axis=1, ignore_index=True,)
-        report_df.to_csv(report_file_name)
+        report_df = pd.concat([report_df, df], axis=0, ignore_index=True,)
+        report_df.to_csv(self.report_file_name)

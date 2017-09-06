@@ -132,6 +132,7 @@ class LGPredictor(Predictor):
         super(LGPredictor, self).__init__(pv, v, model_type)
 
     def train_rf(self, ev_data, dv_data):
+        from sklearn.linear_model import SGDClassifier
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
         model = SGDClassifier(loss="log",
@@ -157,5 +158,4 @@ class LGPredictor(Predictor):
         df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
         self.report_df = df
 
-        return self.calculate_auc_score(dv_data, predict),\
-                                        model.feature_importances_
+        return self.calculate_auc_score(dv_data, predict), None

@@ -3,6 +3,7 @@ from lib.metrics import Metrics_Origin
 from lib import statistic as st
 from lib import ex_randf as rf
 from lib.predictor import RFPredictor
+from lib.predictor import LGPredictor
 import configparser
 import sys
 import random
@@ -39,9 +40,9 @@ def predict(ver, predict_ver,  alike_metrics):
     training_m = Metrics_Origin(ver, METRICS_DIR)
     evaluate_m = Metrics_Origin(predict_ver, METRICS_DIR)
 
-    nml_analyzer = AUCAnalyzer(predict_ver, 'NML')
-    rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN')
-    itg_analyzer = AUCAnalyzer(predict_ver, 'ITG')
+    nml_analyzer = AUCAnalyzer(predict_ver, 'NML', TARGET)
+    rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN', TARGET)
+    itg_analyzer = AUCAnalyzer(predict_ver, 'ITG', TARGET)
     # nml_analyzer = Analyzer(predict_ver, 'NML')
     # rfn_analyzer = Analyzer(predict_ver, 'RFN')
     # itg_analyzer = Analyzer(predict_ver, 'ITG')
@@ -56,7 +57,8 @@ def predict(ver, predict_ver,  alike_metrics):
             print('iteration: ' +str(i))
 
         # NML MODEL
-        rf = RFPredictor(predict_ver, ver, 'NML')
+        # rf = RFPredictor(predict_ver, ver, 'NML')
+        rf = LGPredictor(predict_ver, ver, 'NML')
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
@@ -71,7 +73,8 @@ def predict(ver, predict_ver,  alike_metrics):
 
 
         # RFN MODEL
-        rf = RFPredictor(predict_ver, ver, 'RFN')
+        # rf = RFPredictor(predict_ver, ver, 'RFN')
+        rf = LGPredictor(predict_ver, ver, 'RFN')
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
@@ -84,7 +87,8 @@ def predict(ver, predict_ver,  alike_metrics):
             rfn_analyzer.calculate()
 
         # INTELLIGENCE MODEL
-        rf = RFPredictor(predict_ver, ver, 'ITG')
+        # rf = RFPredictor(predict_ver, ver, 'ITG')
+        rf = LGPredictor(predict_ver, ver, 'ITG')
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         alike_df = training_m.get_specific_df(alike_metrics)
         X_resampled, y_resampled = sm.fit_sample( alike_df, training_m.fault )
