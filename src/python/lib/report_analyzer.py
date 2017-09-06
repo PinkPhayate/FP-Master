@@ -1,6 +1,7 @@
 import pandas as pd
 from lib.auc import AUC
 import sklearn.metrics as skm
+from sklearn.exceptions import UndefinedMetricWarning
 import configparser
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
@@ -169,8 +170,8 @@ class AUCAnalyzer(Analyzer):
     def __init__(self, version, model_type, target_sw):
         self.predict_version = version
         self.model_type = model_type
-        self.__remove_report_files()
         self.report_file_name = REPORT_DIR + target_sw+'-aucreport.csv'
+        # self.__remove_report_files()
 
         if self.accum_recall0 is not None:
             self.accum_recall0 = []

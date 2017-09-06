@@ -138,7 +138,7 @@ class LGPredictor(Predictor):
         model = SGDClassifier(loss="log",
                               penalty="l2",
                               class_weight="balanced",
-                              n_iter=1000)
+                              max_iter=1000)
         model.fit(ev_data, column_or_1d(dv_data))
 
         return model

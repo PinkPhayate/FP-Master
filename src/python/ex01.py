@@ -11,11 +11,13 @@ from imblearn.over_sampling import RandomOverSampler
 from lib.report_analyzer import Analyzer
 from lib.report_analyzer import AUCAnalyzer
 import pandas as pd
+from tqdm import tqdm
 REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
 # set environment lab or home
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
+REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
 # METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/JR/metrics-data/Apache-Derby'
 
 
@@ -52,10 +54,7 @@ def predict(ver, predict_ver,  alike_metrics):
     # acum_rfn_report= pd.DataFrme([])
     # acum_intel_report= pd.DataFrme([])
 
-    for i in range(ITER):
-        if i%500 == 0:
-            print('iteration: ' +str(i))
-
+    for i in tqdm(range(ITER)):
         # NML MODEL
         # rf = RFPredictor(predict_ver, ver, 'NML')
         rf = LGPredictor(predict_ver, ver, 'NML')
@@ -117,13 +116,20 @@ def exp(v1, v2):
     print(alike_metrics)
     predict(v1, v2, alike_metrics)
 
+def __remove_report_files():
+    report_file_name = REPORT_DIR + TARGET+'-aucreport.csv'
+    import os
+    if os.path.exists(report_file_name):
+        os.remove(report_file_name)
 
 
 def exp_derby():
+    __remove_report_files()
     exp('10.8','10.9')
     exp('10.9','10.10')
 
 def exp_solr():
+    __remove_report_files()
     exp('4.1.0', '4.2.0')
     exp('4.2.0', '4.3.0')
     exp('4.3.0', '4.4.0')
