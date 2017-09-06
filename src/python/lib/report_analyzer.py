@@ -300,3 +300,33 @@ class AUCAnalyzer(Analyzer):
             report_df = pd.DataFrame([])
         report_df = pd.concat([report_df, df], axis=1, ignore_index=True,)
         report_df.to_csv(report_file_name)
+class ImportanceAnalyzer(object):
+    importances = []
+    statistics_list = None
+
+
+    def __init__(self, target_sw, version):
+        if self.importances is not None:
+            self.importances = []
+        self.target_sw = target_sw
+        self.report_file_name = REPORT_DIR + '/importance-distribution/' +\
+                                target_sw + version + '-imp-dist.csv'
+
+    def set_statistics(self, statistics_list):
+        self.statistics_list = statistics_list
+        df = pd.DataFrame(statistics_list)
+        df.to_csv(self.report_file_name)
+
+
+    def append_importances(self, importances):
+        self.importances.append(importances)
+
+    def export(self):
+        metrics = ['pd1','pd2','pd3','pd4','pd5','pd6','pc1','pc2','pc3','pc4']
+        origin = pd.read_csv(self.report_file_name, header=0, index_col=0).T
+        origin.columns = metrics
+        df = pd.DataFrame(self.importances)
+        df.columns = metrics
+        df = pd.concat([origin, df], axis=0)
+        df.reset_index(drop=True, inplace=True)
+        df.to_csv(self.report_file_name)

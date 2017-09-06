@@ -9,6 +9,7 @@ import random
 from imblearn.over_sampling import RandomOverSampler
 from lib.report_analyzer import Analyzer
 from lib.report_analyzer import AUCAnalyzer
+from lib.report_analyzer import ImportanceAnalyzer
 import pandas as pd
 REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
 # set environment lab or home
@@ -42,6 +43,7 @@ def predict(ver, predict_ver,  alike_metrics):
     nml_analyzer = AUCAnalyzer(predict_ver, 'NML')
     rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN')
     itg_analyzer = AUCAnalyzer(predict_ver, 'ITG')
+    imp_analyzer = ImportanceAnalyzer(target_sw=TARGET, version=predict_ver)
     # nml_analyzer = Analyzer(predict_ver, 'NML')
     # rfn_analyzer = Analyzer(predict_ver, 'RFN')
     # itg_analyzer = Analyzer(predict_ver, 'ITG')
@@ -76,6 +78,7 @@ def predict(ver, predict_ver,  alike_metrics):
         X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
         rfn_value, importance = rf.predict_rf(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
+        imp_analyzer.append_importances(importance)
         rf.set_is_new_df(evaluate_m.isNew)
         rf.set_is_modified_df(evaluate_m.isModified)
         report_df = rf.export_report(predict_ver)
@@ -104,12 +107,16 @@ def predict(ver, predict_ver,  alike_metrics):
     itg_df = itg_analyzer.calculate_average(ITER)
     df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True, axis=0)
     nml_analyzer.export(target_sw=TARGET, df=df)    # どのanalyzerクラスでも良い
+    imp_analyzer.export()
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)
     version2 = Metrics_Origin(v2, METRICS_DIR)
     print(v1+'-'+v2)
-    alike_metrics = st.compare_two_versions(version1,version2)
+    # alike_metrics = st.compare_two_versions(version1,version2)
+    alike_metrics, statistics = st.compare_two_versions_2investigation(version1,version2)
+    imp_analyzer = ImportanceAnalyzer(target_sw=TARGET, version=v2)
+    imp_analyzer.set_statistics(statistics)
     print(alike_metrics)
     predict(v1, v2, alike_metrics)
 

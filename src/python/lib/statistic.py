@@ -3,6 +3,7 @@ from scipy import stats
 # import figure as fig
 import configparser
 import sys
+from lib.report_analyzer import ImportanceAnalyzer
 
 THRESOLD = 0.05
 import configparser
@@ -40,6 +41,11 @@ def ks_2samp(m1, m2):
     return ks_result.pvalue
     # print(stats.ks_2samp(m1, m2))
 
+def ks_2samp2(m1, m2):
+    ks_result = stats.ks_2samp(m1, m2)
+    if EXECUTION_MODE == 'debug':
+        print(ks_result.pvalue)
+    return ks_result.pvalue, ks_result.statistic
 
 
 
@@ -56,3 +62,18 @@ def compare_two_versions(version1, version2):
         if (THRESOLD < pvalue):
             alike_metrics.append(m)
     return alike_metrics
+
+def compare_two_versions_2investigation(version1, version2):
+    metrics = ['pd1','pd2','pd3','pd4','pd5','pd6','pc1','pc2','pc3','pc4']
+    alike_metrics = []
+    statistics_list = []
+    for m in metrics:
+        if EXECUTION_MODE == 'debug':
+            print(m+': ',end='')
+        m1 = version1.mrg_df[m]
+        m2 = version2.mrg_df[m]
+        pvalue, statistic = ks_2samp2(m1, m2)
+        statistics_list.append(statistic)
+        if (THRESOLD < pvalue):
+            alike_metrics.append(m)
+    return alike_metrics, statistics_list
