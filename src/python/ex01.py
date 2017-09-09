@@ -42,13 +42,15 @@ def predict(ver, predict_ver,  alike_metrics):
     training_m = Metrics_Origin(ver, METRICS_DIR)
     evaluate_m = Metrics_Origin(predict_ver, METRICS_DIR)
 
+    # バイナリを出力,
     nml_analyzer = AUCAnalyzer(predict_ver, 'NML', TARGET)
     rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN', TARGET)
     itg_analyzer = AUCAnalyzer(predict_ver, 'ITG', TARGET)
+
+    # 確率を出力, predict_rfをpredict_rf_probaに変更する必要あり
     # nml_analyzer = Analyzer(predict_ver, 'NML')
     # rfn_analyzer = Analyzer(predict_ver, 'RFN')
     # itg_analyzer = Analyzer(predict_ver, 'ITG')
-
 
     # acum_nml_report= pd.DataFrme([])
     # acum_rfn_report= pd.DataFrme([])
