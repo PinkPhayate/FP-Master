@@ -148,10 +148,29 @@ class LGPredictor(Predictor):
         paramater = ev_data.copy()
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
         output = model.predict(ev_data)
 
         # ev_data = pd.concat([paramater, dv_data],axis=1)
         predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict), None
+
+    def predict_rf_proba(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
+        output = model.predict_proba(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output[:,1])
         predict.columns = [['predict']]
         df = pd.concat([paramater, predict], axis=1)
         dv_data.columns = [['actual']]
