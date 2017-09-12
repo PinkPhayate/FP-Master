@@ -178,3 +178,149 @@ class LGPredictor(Predictor):
         self.report_df = df
 
         return self.calculate_auc_score(dv_data, predict), None
+
+class SVCPredictor(Predictor):
+    def __init__(self, pv, v, model_type):
+        super(LGPredictor, self).__init__(pv, v, model_type)
+
+    def train_rf(self, ev_data, dv_data):
+        from sklearn.svm import SVC
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        model = SVC()
+        model.fit(ev_data, column_or_1d(dv_data))
+
+        return model
+
+    def predict_rf(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
+        output = model.predict(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict), None
+
+    def predict_rf_proba(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
+        output = model.predict_proba(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output[:,1])
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict), None
+class NaivePredictor(Predictor):
+    def __init__(self, pv, v, model_type):
+        super(LGPredictor, self).__init__(pv, v, model_type)
+
+    def train_rf(self, ev_data, dv_data):
+        from sklearn.naive_bayes import GaussianNB
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        model = GaussianNB()
+        model.fit(ev_data, column_or_1d(dv_data))
+
+        return model
+
+    def predict_rf(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
+        output = model.predict(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict), None
+
+    def predict_rf_proba(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
+        output = model.predict_proba(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output[:,1])
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict), None
+
+class TreePredictor(Predictor):
+    def __init__(self, pv, v, model_type):
+        super(LGPredictor, self).__init__(pv, v, model_type)
+
+    def train_rf(self, ev_data, dv_data):
+        from sklearn.tree import DecisionTreeRegressor
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        model = DecisionTreeRegressor()
+        model.fit(ev_data, column_or_1d(dv_data))
+
+        return model
+
+    def predict_rf(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
+        output = model.predict(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict), None
+
+    def predict_rf_proba(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
+        output = model.predict_proba(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output[:,1])
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict), None
