@@ -192,6 +192,23 @@ class SVCPredictor(Predictor):
 
         return model
 
+class SVRPredictor(Predictor):
+    def __init__(self, pv, v, model_type):
+        super(SVRPredictor, self).__init__(pv, v, model_type)
+
+    def train_model(self, ev_data, dv_data):
+        from sklearn.svm import SVR
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        model = SVR(kernel='poly',
+                    degree=len(ev_data[0]),
+                    max_iter=-1)    # no limit
+        print('model fitting')
+        model.fit(ev_data, column_or_1d(dv_data))
+        print('model fitted')
+
+        return model
+
 class TreePredictor(Predictor):
     def __init__(self, pv, v, model_type):
         super(TreePredictor, self).__init__(pv, v, model_type)
