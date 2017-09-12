@@ -89,7 +89,7 @@ class RFPredictor(Predictor):
     def __init__(self, pv, v, model_type):
         super(RFPredictor, self).__init__(pv, v, model_type)
 
-    def train_rf(self, ev_data, dv_data):
+    def train_model(self, ev_data, dv_data):
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
         model = RandomForestClassifier(
@@ -149,7 +149,7 @@ class LGPredictor(Predictor):
     def __init__(self, pv, v, model_type):
         super(LGPredictor, self).__init__(pv, v, model_type)
 
-    def train_rf(self, ev_data, dv_data):
+    def train_model(self, ev_data, dv_data):
         from sklearn.linear_model import SGDClassifier
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
@@ -183,7 +183,7 @@ class SVCPredictor(Predictor):
     def __init__(self, pv, v, model_type):
         super(SVCPredictor, self).__init__(pv, v, model_type)
 
-    def train_rf(self, ev_data, dv_data):
+    def train_model(self, ev_data, dv_data):
         from sklearn.svm import SVC
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
@@ -196,7 +196,7 @@ class TreePredictor(Predictor):
     def __init__(self, pv, v, model_type):
         super(TreePredictor, self).__init__(pv, v, model_type)
 
-    def train_rf(self, ev_data, dv_data):
+    def train_model(self, ev_data, dv_data):
         from sklearn.tree import DecisionTreeRegressor
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()

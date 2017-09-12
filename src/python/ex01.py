@@ -2,14 +2,13 @@
 from lib.metrics import Metrics_Origin
 from lib import statistic as st
 from lib import ex_randf as rf
-from lib.predictor import RFPredictor, LGPredictor, SVCPredictor, TreePredictor
-from lib.predictor import LGPredictor
 import configparser
 import sys
 import random
 from imblearn.over_sampling import RandomOverSampler
 from lib.report_analyzer import Analyzer
 from lib.report_analyzer import AUCAnalyzer
+from lib.repository import PredictorRepository
 import pandas as pd
 from tqdm import tqdm
 REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
@@ -26,11 +25,11 @@ TARGET = ''
 
 args = sys.argv
 ITER = int(args[2]) if (len(args)>2) else (2000)
+predictor_type = str(args[3]) if (len(args)>3) else (2000)
 
-def analyze_report(report_df):
-    analyzer.analyze()
 
 def predict(ver, predict_ver,  alike_metrics):
+    predictor_rep = PredictorRepository(predict_ver, ver)
     # if TARGET == 'Derby':
     #     #  Apache-Derby
     #     training_m = Metrics_Origin(ver, METRICS_DIR)
@@ -56,49 +55,52 @@ def predict(ver, predict_ver,  alike_metrics):
 
     for i in tqdm(range(ITER)):
         # NML MODEL
-        # rf = RFPredictor(predict_ver, ver, 'NML')
-        # rf = LGPredictor(predict_ver, ver, 'NML')
-        # rf = SVCPredictor(predict_ver, ver, 'NML')
-        rf = TreePredictor(predict_ver, ver, 'NML')
-
+        predictor = predictor_rep.get_predictor('NML', predictor_type)
+        if predictor is None:
+            print(' predictor has not found, type: ' + predictor_type)
+            return
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
-        model = rf.train_rf( X_resampled, y_resampled )
-        nml_value, importance = rf.predict_test_data(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
-        rf.set_is_new_df(evaluate_m.isNew)
-        rf.set_is_modified_df(evaluate_m.isModified)
-        report_df = rf.export_report(predict_ver)
+        model = predictor.train_model( X_resampled, y_resampled )
+        nml_value, importance = predictor.predict_test_data(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
+        predictor.set_is_new_df(evaluate_m.isNew)
+        predictor.set_is_modified_df(evaluate_m.isModified)
+        report_df = predictor.export_report(predict_ver)
         if report_df is not None:
             nml_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             nml_analyzer.calculate()
 
 
         # RFN MODEL
-        # rf = RFPredictor(predict_ver, ver, 'RFN')
-        rf = LGPredictor(predict_ver, ver, 'RFN')
+        predictor = predictor_rep.get_predictor('RFN', predictor_type)
+        if predictor is None:
+            print(' predictor has not found, type: ' + predictor_type)
+            return
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
-        model = rf.train_rf( X_resampled, y_resampled )
-        rfn_value, importance = rf.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
-        rf.set_is_new_df(evaluate_m.isNew)
-        rf.set_is_modified_df(evaluate_m.isModified)
-        report_df = rf.export_report(predict_ver)
+        model = predictor.train_model( X_resampled, y_resampled )
+        rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
+        predictor.set_is_new_df(evaluate_m.isNew)
+        predictor.set_is_modified_df(evaluate_m.isModified)
+        report_df = predictor.export_report(predict_ver)
         if report_df is not None:
             rfn_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             rfn_analyzer.calculate()
 
         # INTELLIGENCE MODEL
-        # rf = RFPredictor(predict_ver, ver, 'ITG')
-        rf = LGPredictor(predict_ver, ver, 'ITG')
+        predictor = predictor_rep.get_predictor('ITG', predictor_type)
+        if predictor is None:
+            print(' predictor has not found, type: ' + predictor_type)
+            return
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         alike_df = training_m.get_specific_df(alike_metrics)
         X_resampled, y_resampled = sm.fit_sample( alike_df, training_m.fault )
-        model = rf.train_rf( X_resampled, y_resampled )
+        model = predictor.train_model( X_resampled, y_resampled )
         alike_df = evaluate_m.get_specific_df(alike_metrics)
-        rfn_value, importance = rf.predict_test_data(model, alike_df, evaluate_m.fault, TARGET + "-ex1itg.csv")
-        rf.set_is_new_df(evaluate_m.isNew)
-        rf.set_is_modified_df(evaluate_m.isModified)
-        report_df = rf.export_report(predict_ver)
+        rfn_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, TARGET + "-ex1itg.csv")
+        predictor.set_is_new_df(evaluate_m.isNew)
+        predictor.set_is_modified_df(evaluate_m.isModified)
+        report_df = predictor.export_report(predict_ver)
         if report_df is not None:
             itg_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             itg_analyzer.calculate()
