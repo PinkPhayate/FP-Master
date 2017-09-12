@@ -25,7 +25,7 @@ TARGET = ''
 
 args = sys.argv
 ITER = int(args[2]) if (len(args)>2) else (2000)
-predictor_type = str(args[3]) if (len(args)>3) else (2000)
+PRED_TYPE = str(args[3]) if (len(args)>3) else (2000)
 
 
 def predict(ver, predict_ver,  alike_metrics):
@@ -55,9 +55,9 @@ def predict(ver, predict_ver,  alike_metrics):
 
     for i in tqdm(range(ITER)):
         # NML MODEL
-        predictor = predictor_rep.get_predictor('NML', predictor_type)
+        predictor = predictor_rep.get_predictor('NML', PRED_TYPE)
         if predictor is None:
-            print(' predictor has not found, type: ' + predictor_type)
+            print(' predictor has not found, type: ' + PRED_TYPE)
             return
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
@@ -72,10 +72,7 @@ def predict(ver, predict_ver,  alike_metrics):
 
 
         # RFN MODEL
-        predictor = predictor_rep.get_predictor('RFN', predictor_type)
-        if predictor is None:
-            print(' predictor has not found, type: ' + predictor_type)
-            return
+        predictor = predictor_rep.get_predictor('RFN', PRED_TYPE)
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
         model = predictor.train_model( X_resampled, y_resampled )
@@ -88,10 +85,7 @@ def predict(ver, predict_ver,  alike_metrics):
             rfn_analyzer.calculate()
 
         # INTELLIGENCE MODEL
-        predictor = predictor_rep.get_predictor('ITG', predictor_type)
-        if predictor is None:
-            print(' predictor has not found, type: ' + predictor_type)
-            return
+        predictor = predictor_rep.get_predictor('ITG', PRED_TYPE)
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         alike_df = training_m.get_specific_df(alike_metrics)
         X_resampled, y_resampled = sm.fit_sample( alike_df, training_m.fault )
@@ -109,8 +103,8 @@ def predict(ver, predict_ver,  alike_metrics):
     nml_df = nml_analyzer.calculate_average(ITER)
     rfn_df = rfn_analyzer.calculate_average(ITER)
     itg_df = itg_analyzer.calculate_average(ITER)
-    df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True, axis=0)
-    nml_analyzer.export(target_sw=TARGET, df=df)    # どのanalyzerクラスでも良い
+    df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True)
+    nml_analyzer.export(target_sw=TARGET, df=df, predictor_type=PRED_TYPE)    # どのanalyzerクラスでも良い
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)

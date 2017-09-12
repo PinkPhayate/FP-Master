@@ -11,6 +11,7 @@ REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
 
 class Analyzer(object):
     COLUM_NAMES = ['predict', 'actual', 'isNew', 'isModified']
+    COLUMNS = ['MODEL', 'value0', 'value1', 'value2', 'value3', 'value4']
     accum_val0 = []  # 通常の値
     accum_val1 = []  # FPモジュールの上位何%が新モジュールなのか
     accum_val2 = []  # 変更のなかったモジュールに絞ったところ、どれくらいの精度なのか
@@ -138,14 +139,17 @@ class Analyzer(object):
         print(msg)
         return df
 
-    def export(self, target_sw, df):
-        report_file_name = REPORT_DIR + target_sw+'-report.csv'
+    def export(self, target_sw, df, predictor_type):
+        report_file_name = REPORT_DIR + target_sw+'-' +predictor_type+'.csv'
+        df.columns = self.COLUMNS
+        df = df.ix[[1,3,5], :]
         import os
         if os.path.exists(report_file_name):
             report_df = pd.read_csv(report_file_name, header=0, index_col=0)
+            report_df.columns = self.COLUMNS
         else:
             report_df = pd.DataFrame([])
-        report_df = pd.concat([report_df, df], axis=1, ignore_index=True,)
+        report_df = pd.concat([report_df, df], axis=0, ignore_index=True,)
         report_df.to_csv(report_file_name)
 
 class AUCAnalyzer(Analyzer):
@@ -170,6 +174,7 @@ class AUCAnalyzer(Analyzer):
     def __init__(self, version, model_type, target_sw):
         self.predict_version = version
         self.model_type = model_type
+        self.target_sw = target_sw
         self.report_file_name = REPORT_DIR + target_sw+'-aucreport.csv'
         # self.__remove_report_files()
 
@@ -304,7 +309,8 @@ class AUCAnalyzer(Analyzer):
         print(msg)
         return df
 
-    def export(self, target_sw, df):
+    def export(self, target_sw, df, predictor_type):
+        report_file_name = REPORT_DIR + target_sw+'-' +predictor_type+'-auc.csv'
         df.columns = self.COLUMNS
         df = df.ix[[1,3,5], :]
         print(df)
@@ -315,4 +321,4 @@ class AUCAnalyzer(Analyzer):
         else:
             report_df = pd.DataFrame([])
         report_df = pd.concat([report_df, df], axis=0, ignore_index=True,)
-        report_df.to_csv(self.report_file_name)
+        report_df.to_csv(report_file_name)
