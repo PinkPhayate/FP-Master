@@ -2,7 +2,7 @@
 from lib.metrics import Metrics_Origin
 from lib import statistic as st
 from lib import ex_randf as rf
-from lib.predictor import RFPredictor
+from lib.predictor import RFPredictor, LGPredictor, SVCPredictor, TreePredictor
 from lib.predictor import LGPredictor
 import configparser
 import sys
@@ -57,11 +57,14 @@ def predict(ver, predict_ver,  alike_metrics):
     for i in tqdm(range(ITER)):
         # NML MODEL
         # rf = RFPredictor(predict_ver, ver, 'NML')
-        rf = LGPredictor(predict_ver, ver, 'NML')
+        # rf = LGPredictor(predict_ver, ver, 'NML')
+        # rf = SVCPredictor(predict_ver, ver, 'NML')
+        rf = TreePredictor(predict_ver, ver, 'NML')
+
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
-        nml_value, importance = rf.predict_rf_proba(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
+        nml_value, importance = rf.predict_test_data(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
         rf.set_is_new_df(evaluate_m.isNew)
         rf.set_is_modified_df(evaluate_m.isModified)
         report_df = rf.export_report(predict_ver)
@@ -70,14 +73,13 @@ def predict(ver, predict_ver,  alike_metrics):
             nml_analyzer.calculate()
 
 
-
         # RFN MODEL
         # rf = RFPredictor(predict_ver, ver, 'RFN')
         rf = LGPredictor(predict_ver, ver, 'RFN')
         sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
-        rfn_value, importance = rf.predict_rf_proba(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
+        rfn_value, importance = rf.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
         rf.set_is_new_df(evaluate_m.isNew)
         rf.set_is_modified_df(evaluate_m.isModified)
         report_df = rf.export_report(predict_ver)
@@ -93,7 +95,7 @@ def predict(ver, predict_ver,  alike_metrics):
         X_resampled, y_resampled = sm.fit_sample( alike_df, training_m.fault )
         model = rf.train_rf( X_resampled, y_resampled )
         alike_df = evaluate_m.get_specific_df(alike_metrics)
-        rfn_value, importance = rf.predict_rf_proba(model, alike_df, evaluate_m.fault, TARGET + "-ex1itg.csv")
+        rfn_value, importance = rf.predict_test_data(model, alike_df, evaluate_m.fault, TARGET + "-ex1itg.csv")
         rf.set_is_new_df(evaluate_m.isNew)
         rf.set_is_modified_df(evaluate_m.isModified)
         report_df = rf.export_report(predict_ver)
