@@ -59,12 +59,13 @@ class Predictor(object):
         if self.is_new_df is not None and\
            self.is_modified_df is not None and\
            self.report_df is not None:
+            value_df = self.report_df.copy()
             self.report_df = pd.concat([self.report_df, self.is_new_df], axis=1)
             self.report_df = pd.concat([self.report_df, self.is_modified_df], axis=1)
             if sorting:
                 self.report_df = self.report_df.sort_values(by='predict', ascending=False)
             # self.report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
-            return self.report_df
+            return self.report_df, value_df
 
     def predict_test_data(self, model, ev_data, dv_data, filename):
         # save for write file about metrics and predict and actualy

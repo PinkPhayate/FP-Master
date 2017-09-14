@@ -48,6 +48,12 @@ def predict(ver, predict_ver,  alike_metrics):
     rfn_analyzer = Analyzer(predict_ver, 'RFN')
     itg_analyzer = Analyzer(predict_ver, 'ITG')
 
+    nml_values = pd.concat([evaluate_m.fault, evaluate_m.isNew, evaluate_m.isModified],axis=1)
+    nml_values.columns = [['actual', 'isNew', 'isModified']]
+    rfn_values = pd.concat([evaluate_m.fault, evaluate_m.isNew, evaluate_m.isModified],axis=1)
+    rfn_values.columns = [['actual', 'isNew', 'isModified']]
+    itg_values = pd.concat([evaluate_m.fault, evaluate_m.isNew, evaluate_m.isModified],axis=1)
+    itg_values.columns = [['actual', 'isNew', 'isModified']]
 
     # acum_nml_report= pd.DataFrme([])
     # acum_rfn_report= pd.DataFrme([])
@@ -65,10 +71,12 @@ def predict(ver, predict_ver,  alike_metrics):
         nml_value, importance = predictor.predict_test_data(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
         predictor.set_is_new_df(evaluate_m.isNew)
         predictor.set_is_modified_df(evaluate_m.isModified)
-        report_df = predictor.export_report(predict_ver)
+        report_df, value_df = predictor.export_report(predict_ver)
         if report_df is not None:
             nml_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             nml_analyzer.calculate()
+        if value_df is not None:
+            nml_values = pd.concat([nml_values, value_df.loc[:,'predict']],axis=1)
 
 
         # RFN MODEL
@@ -79,10 +87,12 @@ def predict(ver, predict_ver,  alike_metrics):
         rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
         predictor.set_is_new_df(evaluate_m.isNew)
         predictor.set_is_modified_df(evaluate_m.isModified)
-        report_df = predictor.export_report(predict_ver)
+        report_df, value_df = predictor.export_report(predict_ver)
         if report_df is not None:
             rfn_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             rfn_analyzer.calculate()
+        if value_df is not None:
+            rfn_values = pd.concat([rfn_values, value_df.loc[:,'predict']],axis=1)
 
         # INTELLIGENCE MODEL
         predictor = predictor_rep.get_predictor('ITG', PRED_TYPE)
@@ -94,10 +104,12 @@ def predict(ver, predict_ver,  alike_metrics):
         rfn_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, TARGET + "-ex1itg.csv")
         predictor.set_is_new_df(evaluate_m.isNew)
         predictor.set_is_modified_df(evaluate_m.isModified)
-        report_df = predictor.export_report(predict_ver)
+        report_df, value_df = predictor.export_report(predict_ver)
         if report_df is not None:
             itg_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             itg_analyzer.calculate()
+        if value_df is not None:
+            itg_values = pd.concat([itg_values, value_df.loc[:,'predict']],axis=1)
 
     # export report
     nml_df = nml_analyzer.calculate_average(ITER)
@@ -105,6 +117,11 @@ def predict(ver, predict_ver,  alike_metrics):
     itg_df = itg_analyzer.calculate_average(ITER)
     df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True)
     nml_analyzer.export(target_sw=TARGET, df=df, predictor_type=PRED_TYPE)    # どのanalyzerクラスでも良い
+
+    nml_values.to_csv(REPORT_DIR + predict_ver + 'nml_values.csv')
+    rfn_values.to_csv(REPORT_DIR + predict_ver + 'rfn_values.csv')
+    itg_values.to_csv(REPORT_DIR + predict_ver + 'itg_values.csv')
+
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)
