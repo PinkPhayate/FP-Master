@@ -59,7 +59,7 @@ def predict(ver, predict_ver,  alike_metrics):
         if predictor is None:
             print(' predictor has not found, type: ' + PRED_TYPE)
             return
-        sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
+        sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
         model = predictor.train_model( X_resampled, y_resampled )
         nml_value, importance = predictor.predict_test_data(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
@@ -73,7 +73,7 @@ def predict(ver, predict_ver,  alike_metrics):
 
         # RFN MODEL
         predictor = predictor_rep.get_predictor('RFN', PRED_TYPE)
-        sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
+        sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
         model = predictor.train_model( X_resampled, y_resampled )
         rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, TARGET + "-ex1rfn.csv")
@@ -86,7 +86,7 @@ def predict(ver, predict_ver,  alike_metrics):
 
         # INTELLIGENCE MODEL
         predictor = predictor_rep.get_predictor('ITG', PRED_TYPE)
-        sm = RandomOverSampler(ratio=0.2, random_state=random.randint(1,100))
+        sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
         alike_df = training_m.get_specific_df(alike_metrics)
         X_resampled, y_resampled = sm.fit_sample( alike_df, training_m.fault )
         model = predictor.train_model( X_resampled, y_resampled )
