@@ -37,13 +37,34 @@ def calc_rate_fp_modified():
                 plt.plot(left, height, label=lab)
             except Exception as e:
                 print(e)
-                print('no file: {}'.format(filename))
     plt.legend()
     plt.show()
+
+def count_bug_in_modified_df():
+    def count_bugs(report_df):
+        bug_df = report_df[report_df['actual'].apply(lambda x: x == 1)]
+        modified_df = bug_df[bug_df['isModified'].apply(lambda x: x == 1)]
+        print('{0} / {1}'.format(len(modified_df), len(bug_df)))
+
+    for version in versions:
+        for model_type in types:
+            filename = '/Users/phayate/Dropbox/STUDY/Result/{0}{1}_values.csv'\
+                                            .format(version, model_type)
+            try:
+                df = pd.read_csv(filename, header=0, index_col=0)
+                print('{0}-{1}: '.format(version, model_type), end='')
+                count_bugs(report_df=df)
+            except Exception as e:
+                print(e)
+
 
 # set environment lab or home
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 versions = inifile.get('version', 'derby').split(',')
+# versions = inifile.get('version', 'solr').split(',')
 versions.extend(inifile.get('version', 'solr').split(','))
 types = inifile.get('model', 'model').split(',')
+
+# calc_rate_fp_modified()
+count_bug_in_modified_df()
