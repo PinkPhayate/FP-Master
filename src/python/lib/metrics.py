@@ -51,6 +51,13 @@ class Metrics_Origin(object):
         self.isModified = self.process_df.apply(
             lambda x: 1 if 0 < x.sum() else 0, axis=1)
 
+    def get_modified_df(self):
+        return self.mrg_df[self.isModified.apply(lambda x: x == 1)],\
+               self.faults[self.isModified.apply(lambda x: x == 1)]
+
+    def get_not_modified_df(self):
+        return self.product_df[self.isModified.apply(lambda x: x == 0)],\
+               self.faults[self.isModified.apply(lambda x: x == 0)]
 
 
 # class Metrics_Derby:

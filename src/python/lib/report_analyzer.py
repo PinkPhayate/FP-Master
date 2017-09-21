@@ -142,7 +142,8 @@ class Analyzer(object):
     def export(self, target_sw, df, predictor_type):
         report_file_name = REPORT_DIR + target_sw+'-' +predictor_type+'.csv'
         df.columns = self.COLUMNS
-        df = df.ix[[1,3,5], :]
+        if 5 < len(df):
+            df = df.ix[[1,3,5], :]
         import os
         if os.path.exists(report_file_name):
             report_df = pd.read_csv(report_file_name, header=0, index_col=0)

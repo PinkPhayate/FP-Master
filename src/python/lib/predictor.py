@@ -20,6 +20,7 @@ class Predictor(object):
         self.predict_ver = pv
         self.ver = v
         self.model_type = model_type
+        self.report_df = None
 
     def get_random_ev(self, size):
         np.random.seed(seed=2019)
@@ -63,7 +64,7 @@ class Predictor(object):
             self.report_df = pd.concat([self.report_df, self.is_modified_df], axis=1)
             if sorting:
                 self.report_df = self.report_df.sort_values(by='predict', ascending=False)
-            # self.report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
+            self.report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
             return self.report_df
 
     def predict_test_data(self, model, ev_data, dv_data, filename):
@@ -84,6 +85,21 @@ class Predictor(object):
 
         return self.calculate_auc_score(dv_data, predict), None
 
+    def predict_ensemble_test_data(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        output = model.predict(ev_data)
+
+        predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        predict.index = paramater.index
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = pd.concat([self.report_df, df], axis=0)\
+                         if self.report_df is not None else df
+        # return self.calculate_auc_score(dv_data, predict), None
+        return None, None
 
 class RFPredictor(Predictor):
     def __init__(self, pv, v, model_type):
