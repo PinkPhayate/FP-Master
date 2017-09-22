@@ -131,7 +131,7 @@ class RFPredictor(Predictor):
         df = pd.concat([paramater, predict],axis=1)
         dv_data.columns = [['actual']]
         df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
-        df['predict'] = df.apply(lambda x: float(x['predict']), axis=1)
+        df.loc[:, 'predict'] = df.apply(lambda x: float(x['predict']), axis=1)
         # df['predict'] = df[['predict']].apply(lambda x: float(x.values[0]))
         self.report_df = df
 

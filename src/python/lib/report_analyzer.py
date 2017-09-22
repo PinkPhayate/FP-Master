@@ -45,6 +45,7 @@ class Analyzer(object):
     def set_report_df(self, report):
         self.report_df = report
         self.report_df.columns = [self.COLUM_NAMES]
+        self.report_df = self.report_df.reset_index( drop = True )
 
     def calculate(self):
         v0 = self.calculate_0()
@@ -210,6 +211,8 @@ class AUCAnalyzer(Analyzer):
             os.remove(self.report_file_name)
 
     def calculate(self):
+        self.report_df.loc[:, 'actual'] = self.report_df.\
+            apply(lambda x: 1 if x['actual'] > 0 else 0, axis=1)
         self.calculate_0()
         self.calculate_2()
         self.calculate_3()
