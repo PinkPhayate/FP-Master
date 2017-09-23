@@ -316,13 +316,17 @@ class AUCAnalyzer(Analyzer):
     def export(self, target_sw, df, predictor_type):
         report_file_name = REPORT_DIR + target_sw+'-' +predictor_type+'-auc.csv'
         df.columns = self.COLUMNS
-        df = df.ix[[1,3,5], :]
-        print(df)
+        if 5 < len(df):
+            df = df.ix[[1, 3, 5], :]
+        # print(df)
         import os
-        if os.path.exists(self.report_file_name):
-            report_df = pd.read_csv(self.report_file_name, header=0, index_col=0)
+        if os.path.exists(report_file_name):
+            report_df = pd.read_csv(report_file_name, header=0, index_col=0)
             report_df.columns = self.COLUMNS
         else:
             report_df = pd.DataFrame([])
+        # print('--------------')
+        # print(df)
+        # print(report_df)
         report_df = pd.concat([report_df, df], axis=0, ignore_index=True,)
         report_df.to_csv(report_file_name)
