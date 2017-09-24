@@ -41,12 +41,12 @@ def predict(ver, predict_ver,  alike_metrics):
     training_m = Metrics_Origin(ver, METRICS_DIR)
     evaluate_m = Metrics_Origin(predict_ver, METRICS_DIR)
 
-    # nml_analyzer = AUCAnalyzer(predict_ver, 'NML', TARGET)
-    # rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN', TARGET)
-    # itg_analyzer = AUCAnalyzer(predict_ver, 'ITG', TARGET)
-    nml_analyzer = Analyzer(predict_ver, 'NML')
-    rfn_analyzer = Analyzer(predict_ver, 'RFN')
-    itg_analyzer = Analyzer(predict_ver, 'ITG')
+    nml_analyzer = AUCAnalyzer(predict_ver, 'NML', TARGET)
+    rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN', TARGET)
+    itg_analyzer = AUCAnalyzer(predict_ver, 'ITG', TARGET)
+    # nml_analyzer = Analyzer(predict_ver, 'NML')
+    # rfn_analyzer = Analyzer(predict_ver, 'RFN')
+    # itg_analyzer = Analyzer(predict_ver, 'ITG')
 
 
     # acum_nml_report= pd.DataFrme([])

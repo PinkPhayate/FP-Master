@@ -8,7 +8,7 @@
 同時に両方の値を求めることはできず、内部のプログラムを変更する必要がある。
 
 ### output
-
+accuracy, recall, precision 
 
 ### paramater
 
@@ -30,7 +30,7 @@ python ex01.py derby 50 rf
 変更のないモデルにはプロダクトメトリクスのみを用いたモデルで予測を行い、変更のあるモデルにはプロセスメトリクスを用いたモデルで予測を行った。
 
 ### output
-
+F1 value
 
 ### paramater
 

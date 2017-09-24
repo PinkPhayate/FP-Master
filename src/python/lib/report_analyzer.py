@@ -220,6 +220,11 @@ class AUCAnalyzer(Analyzer):
         self.calculate_4()
 
     def calculate_2indict(self, __df):
+        if __df[['actual']].sum()[0] < 1:
+            return 0, 0, 0
+        if __df[['predict']].sum()[0] < 1:
+            return 0, 0, 0
+
         recall = skm.recall_score(y_true=__df[['actual']],
                                   y_pred=__df[['predict']])
         accuracy = skm.accuracy_score(y_true=__df[['actual']],
