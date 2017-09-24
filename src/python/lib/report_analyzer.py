@@ -19,6 +19,8 @@ class Analyzer(object):
     accum_val4 = []  # 新モジュールに絞ったところ、どれくらいの精度なのか
     values_list = []
 
+    accum_predict_df = None
+
 
 
     def __init__(self, version, model_type):
@@ -42,10 +44,25 @@ class Analyzer(object):
         global REPORT_DIR
         REPORT_DIR = dir_name
 
+    def set_accum_df(self, report_df):
+        if self.accum_predict_df is None:
+            report_df = report_df[['actual', 'isNew', 'isModified', 'predict']]
+            self.accum_predict_df = report_df
+        else:
+            self.accum_predict_df = pd.concat([self.accum_predict_df,
+                                               report_df.loc[:, 'predict']], axis=1)
+
+    def export_accum_df(self, target_sw):
+        report_file_name = '{0}{1}{2}-{3}acm-pv.csv'\
+            .format(REPORT_DIR, target_sw, self.predict_version, self.model_type)
+        self.accum_predict_df.to_csv(report_file_name)
+
+
     def set_report_df(self, report):
         self.report_df = report
         self.report_df.columns = [self.COLUM_NAMES]
-        self.report_df = self.report_df.reset_index( drop = True )
+        self.set_accum_df(self.report_df.copy())
+        self.report_df = self.report_df.reset_index(drop=True)
 
     def calculate(self):
         v0 = self.calculate_0()

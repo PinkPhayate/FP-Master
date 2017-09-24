@@ -99,6 +99,11 @@ def predict(ver, predict_ver,  alike_metrics):
     rfn_df = rfn_analyzer.calculate_average(ITER)
     itg_df = itg_analyzer.calculate_average(ITER)
     df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True)
+
+    nml_analyzer.export_accum_df(target_sw=TARGET)
+    rfn_analyzer.export_accum_df(target_sw=TARGET)
+    itg_analyzer.export_accum_df(target_sw=TARGET)
+
     nml_analyzer.export(target_sw=TARGET, df=df, predictor_type=PRED_TYPE)    # どのanalyzerクラスでも良い
 
 def exp(v1, v2):

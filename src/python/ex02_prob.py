@@ -65,8 +65,8 @@ def predict(ver, predict_ver,  alike_metrics):
 
     # export report
     ens_df = ens_analyzer.calculate_average(ITER)
-    print(ens_df)
     ens_analyzer.export(target_sw=TARGET, df=ens_df, predictor_type=PRED_TYPE)
+    ens_analyzer.export_accum_df(target_sw=TARGET)
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)
