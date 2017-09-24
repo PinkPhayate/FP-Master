@@ -158,7 +158,7 @@ class Analyzer(object):
 class AUCAnalyzer(Analyzer):
     COLUMNS = ['MODEL', 'recall0', 'precision0', 'accuracy0', 'recall2',
                'precision2', 'accuracy2', 'recall3', 'precision3', 'accuracy3',
-               'recall4', 'precision4', 'accuracy4']
+               'recall4', 'precision4', 'accuracy4', 'avg_fp_num', 'avg_crrct_num']
     report_file_name = ''
 
     accum_accuracy0 = []
@@ -173,6 +173,9 @@ class AUCAnalyzer(Analyzer):
     accum_accuracy4 = []
     accum_recall4 = []
     accum_precision4 = []
+
+    accum_fp_num = []
+    accum_corrct_num = []
 
     def __init__(self, version, model_type, target_sw):
         self.predict_version = version
@@ -205,6 +208,11 @@ class AUCAnalyzer(Analyzer):
             self.accum_precision4 = []
         if self.accum_accuracy4 is not None:
             self.accum_accuracy4 = []
+        if self.accum_fp_num is not None:
+            self.accum_fp_num = []
+        if self.accum_corrct_num is not None:
+            self.accum_corrct_num = []
+
 
     def __remove_report_files(self):
         import os
@@ -218,6 +226,7 @@ class AUCAnalyzer(Analyzer):
         self.calculate_2()
         self.calculate_3()
         self.calculate_4()
+        self.count_fp_num()
 
     def calculate_2indict(self, __df):
         if __df[['actual']].sum()[0] < 1:
@@ -263,6 +272,14 @@ class AUCAnalyzer(Analyzer):
         self.accum_recall4.append(recall)
         self.accum_accuracy4.append(accuracy)
         self.accum_precision4.append(precision)
+
+    def count_fp_num(self):
+        fp_df = self.report_df[self.report_df.apply(
+            lambda x: x['predict'] == 1, axis=1)]
+        correct_df = fp_df[fp_df.apply(lambda x: x['actual'] == 1, axis=1)]
+
+        self.accum_fp_num.append(len(fp_df))
+        self.accum_corrct_num.append(len(correct_df))
 
     def calculate_average(self, iter_num):
         identified_string = '{0}-{1}'\
@@ -318,6 +335,14 @@ class AUCAnalyzer(Analyzer):
         s = sum(self.accum_accuracy4)
         msg = "[report] accuracy4: {}".format(s/itnm)
         df = pd.concat([df, pd.DataFrame(['accuracy4', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_fp_num)
+        msg = "[report] average_fp_num: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['avg_fp_num', s/itnm])], axis=1)
+        print(msg)
+        s = sum(self.accum_corrct_num)
+        msg = "[report] average_corrct_num: {}".format(s/itnm)
+        df = pd.concat([df, pd.DataFrame(['avg_corrct_num', s/itnm])], axis=1)
         print(msg)
         return df
 
