@@ -112,7 +112,9 @@ class Analyzer(object):
         return diagram_value
 
     def calculate_average(self, iter_num):
-        df = pd.DataFrame([self.model_type, self.predict_version])
+        identified_string = '{0}-{1}'\
+            .format(self.model_type, self.predict_version)
+        df = pd.DataFrame(['MODEL', identified_string])
         itnm = float(iter_num)
         print('model: {}, version: {}'.format(
             self.model_type, self.predict_version))
@@ -258,7 +260,9 @@ class AUCAnalyzer(Analyzer):
         self.accum_precision4.append(precision)
 
     def calculate_average(self, iter_num):
-        df = pd.DataFrame([self.model_type, self.predict_version])
+        identified_string = '{0}-{1}'\
+            .format(self.model_type, self.predict_version)
+        df = pd.DataFrame(['MODEL', identified_string])
         itnm = float(iter_num)
         print('model: {}, version: {}'.format(
             self.model_type, self.predict_version))
@@ -318,6 +322,8 @@ class AUCAnalyzer(Analyzer):
         df.columns = self.COLUMNS
         if 5 < len(df):
             df = df.ix[[1, 3, 5], :]
+        if 2 == len(df):
+            df = df.ix[[1], :]
         import os
         if os.path.exists(report_file_name):
             report_df = pd.read_csv(report_file_name, header=0, index_col=0)
