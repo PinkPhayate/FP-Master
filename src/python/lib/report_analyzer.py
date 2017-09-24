@@ -152,6 +152,7 @@ class Analyzer(object):
         report_df = pd.concat([report_df, df], axis=0, ignore_index=True,)
         report_df.to_csv(report_file_name)
 
+
 class AUCAnalyzer(Analyzer):
     COLUMNS = ['MODEL', 'recall0', 'precision0', 'accuracy0', 'recall2',
                'precision2', 'accuracy2', 'recall3', 'precision3', 'accuracy3',
@@ -222,7 +223,7 @@ class AUCAnalyzer(Analyzer):
         accuracy = skm.accuracy_score(y_true=__df[['actual']],
                                       y_pred=__df[['predict']])
         precision = skm.precision_score(y_true=__df[['actual']],
-                                      y_pred=__df[['predict']])
+                                        y_pred=__df[['predict']])
         return recall, accuracy, precision
 
     def calculate_0(self):
@@ -312,19 +313,16 @@ class AUCAnalyzer(Analyzer):
         return df
 
     def export(self, target_sw, df, predictor_type):
-        report_file_name = REPORT_DIR + target_sw+'-' +predictor_type+'-auc.csv'
+        report_file_name = '{0}{1}-{2}-auc.csv'\
+            .format(REPORT_DIR, target_sw, predictor_type)
         df.columns = self.COLUMNS
         if 5 < len(df):
             df = df.ix[[1, 3, 5], :]
-        # print(df)
         import os
         if os.path.exists(report_file_name):
             report_df = pd.read_csv(report_file_name, header=0, index_col=0)
             report_df.columns = self.COLUMNS
         else:
             report_df = pd.DataFrame([])
-        # print('--------------')
-        # print(df)
-        # print(report_df)
         report_df = pd.concat([report_df, df], axis=0, ignore_index=True,)
         report_df.to_csv(report_file_name)

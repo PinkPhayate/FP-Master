@@ -105,4 +105,3 @@ if __name__ == '__main__':
         TARGET = 'Solr'
         METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Solr/all'
         exp_solr()
-ss
