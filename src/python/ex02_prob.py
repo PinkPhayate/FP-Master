@@ -34,15 +34,7 @@ def predict(ver, predict_ver,  alike_metrics):
     training_m = Metrics_Origin(ver, METRICS_DIR)
     evaluate_m = Metrics_Origin(predict_ver, METRICS_DIR)
 
-    # nml_analyzer = AUCAnalyzer(predict_ver, 'NML', TARGET)
-    # rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN', TARGET)
-    # itg_analyzer = AUCAnalyzer(predict_ver, 'ITG', TARGET)
-    ens_analyzer = AUCAnalyzer(predict_ver, 'ENS', TARGET)
-
-
-    # acum_nml_report= pd.DataFrme([])
-    # acum_rfn_report= pd.DataFrme([])
-    # acum_intel_report= pd.DataFrme([])
+    ens_analyzer = Analyzer(predict_ver, 'ENS')
 
     for i in tqdm(range(ITER)):
         # NML MODEL
@@ -52,16 +44,18 @@ def predict(ver, predict_ver,  alike_metrics):
             return
         sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample(training_m.product_df, training_m.fault)
-        nml_model = predictor.train_model(X_resampled, y_resampled)
+        model = predictor.train_model(X_resampled, y_resampled)
         ev_data, dv_data = evaluate_m.get_not_modified_df()
-        nml_value, _ = predictor.predict_ensemble_test_data(nml_model, ev_data, dv_data, None)
+        nml_value, _ = predictor.predict_ensemble_proba(model, ev_data, dv_data, None)
+
+
 
         # RFN MODEL
         sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-        X_resampled, y_resampled = sm.fit_sample(training_m.mrg_df, training_m.fault)
-        model = predictor.train_model(X_resampled, y_resampled)
+        X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
+        model = predictor.train_model( X_resampled, y_resampled )
         ev_data, dv_data = evaluate_m.get_modified_df()
-        mrg_value, _ = predictor.predict_ensemble_test_data(rfn_model, ev_data, dv_data, None)
+        mrg_value, _ = predictor.predict_ensemble_proba(model, ev_data, dv_data, None)
         predictor.set_is_new_df(evaluate_m.isNew)
         predictor.set_is_modified_df(evaluate_m.isModified)
         report_df = predictor.export_report(predict_ver)
@@ -111,3 +105,4 @@ if __name__ == '__main__':
         TARGET = 'Solr'
         METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Solr/all'
         exp_solr()
+ss

@@ -101,6 +101,24 @@ class Predictor(object):
         # return self.calculate_auc_score(dv_data, predict), None
         return None, None
 
+    def predict_ensemble_proba(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        output = model.predict_proba(ev_data)
+
+        predict = pd.DataFrame(output).ix[:,1:]
+        predict.columns = [['predict']]
+        predict.index = paramater.index
+        df = pd.concat([paramater, predict],axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
+        self.report_df = pd.concat([self.report_df, df], axis=0)\
+                         if self.report_df is not None else df
+
+        # return self.calculate_auc_score(dv_data, predict),\
+        #                                 model.feature_importances_
+        return None, None
+
 class RFPredictor(Predictor):
     def __init__(self, pv, v, model_type):
         super(RFPredictor, self).__init__(pv, v, model_type)
@@ -125,6 +143,7 @@ class RFPredictor(Predictor):
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
         output = model.predict_proba(ev_data)
+
         # ev_data = pd.concat([paramater, dv_data],axis=1)
         predict = pd.DataFrame(output).ix[:,1:]
         predict.columns = [['predict']]
@@ -132,16 +151,10 @@ class RFPredictor(Predictor):
         dv_data.columns = [['actual']]
         df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
         df.loc[:, 'predict'] = df.apply(lambda x: float(x['predict']), axis=1)
-        # df['predict'] = df[['predict']].apply(lambda x: float(x.values[0]))
         self.report_df = df
 
-        importance = pd.DataFrame(model.feature_importances_)
-        # importance
-        if EXECUTION_MODE == 'Investigation':
-            return self.calculate_auc_score(dv_data, predict), model.feature_importances_
-        else:
-            return self.calculate_auc_score(dv_data, predict), model.feature_importances_
-            # return calculate_diagram(dv_data, actual), model.feature_importances_
+        return self.calculate_auc_score(dv_data, predict),\
+                                            model.feature_importances_
 
     def predict_test_data(self, model, ev_data, dv_data, filename):
         # save for write file about metrics and predict and actualy
