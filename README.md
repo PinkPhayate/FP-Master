@@ -4,8 +4,8 @@
 ## ex01.py
 
 ### description
-指定した回数予測を行なって、平均を取ったAUC値と、F1値を出力する。
-同時に両方の値を求めることはできず、内部のプログラムを変更する必要がある。
+指定した回数予測を行なって、平均を取った指標を出力する。
+予測結果はバイナリの値で出力され、AUCを求めることはできない
 
 ### output
 accuracy, recall, precision 
@@ -45,3 +45,13 @@ F1 value
 ```
 python ex02.py solr 100 rf
 ```
+
+## ex01_prob.py
+
+### description
+AUCの値を求める
+
+### output
+- AUCの面積の試行回数の平均分を集めたSW-rf.csv
+- 予測確率を試行回数全ての値を保存したacm-pv.csvがある。
+
