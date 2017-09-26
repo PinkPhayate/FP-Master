@@ -100,4 +100,3 @@ ENV/
 .mypy_cache/
 
 # config file
-src/python/config.ini
