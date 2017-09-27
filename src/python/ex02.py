@@ -61,10 +61,13 @@ def predict(ver, predict_ver,  alike_metrics):
         if report_df is not None:
             ens_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             ens_analyzer.calculate()
+            ens_analyzer.analyze_predict_result()
 
     # export report
     ens_df = ens_analyzer.calculate_average(ITER)
     ens_analyzer.export(target_sw=TARGET, df=ens_df, predictor_type=PRED_TYPE)
+    ens_df = ens_analyzer.calculate_num_report_averge(ITER)
+    ens_analyzer.export_count_report(target_sw=TARGET, df=ens_df, predictor_type=PRED_TYPE)
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)
