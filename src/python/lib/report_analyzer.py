@@ -71,6 +71,10 @@ class Analyzer(object):
         self.accum_val1.append(v1)
         # v3 = self.calculate_3()
         # self.accum_val3.append(v3)
+        v2 = self.calculate_2()
+        self.accum_val2.append(v2)
+        v3 = self.calculate_3()
+        self.accum_val3.append(v3)
         v4 = self.calculate_4()
         self.accum_val4.append(v4)
 
