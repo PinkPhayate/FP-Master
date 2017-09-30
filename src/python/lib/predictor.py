@@ -252,3 +252,50 @@ class TreePredictor(Predictor):
         model.fit(ev_data, column_or_1d(dv_data))
 
         return model
+
+class BoostingPredictor(Predictor):
+    def __init__(self, pv, v, model_type):
+        super(BoostingPredictor, self).__init__(pv, v, model_type)
+
+    def train_model(self, ev_data, dv_data):
+        from sklearn.ensemble import GradientBoostingClassifier
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        model = GradientBoostingClassifier()
+        model.fit(ev_data, column_or_1d(dv_data))
+
+        return model
+
+    def predict_ensemble_test_data(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        output = model.predict(ev_data)
+
+        predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        predict.index = paramater.index
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = pd.concat([self.report_df, df], axis=0)\
+                         if self.report_df is not None else df
+        # return self.calculate_auc_score(dv_data, predict), None
+        return None, None
+
+    def predict_proba(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        # output = model.predict(ev_data)
+        output = model.predict_proba(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output[:,1])
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict), None
