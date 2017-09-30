@@ -42,8 +42,9 @@ def predict(ver, predict_ver,  alike_metrics):
         if predictor is None:
             print(' predictor has not found, type: ' + PRED_TYPE)
             return
-        sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-        X_resampled, y_resampled = sm.fit_sample(training_m.product_df, training_m.fault)
+        # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+        # X_resampled, y_resampled = sm.fit_sample(training_m.product_df, training_m.fault)
+        X_resampled, y_resampled = training_m.product_df.as_matrix(), training_m.fault.as_matrix()
         nml_model = predictor.train_model(X_resampled, y_resampled)
         ev_data, dv_data = evaluate_m.get_not_modified_df()
         nml_value, _ = predictor.predict_ensemble_test_data(nml_model, ev_data, dv_data, None)
