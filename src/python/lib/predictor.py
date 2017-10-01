@@ -299,3 +299,21 @@ class BoostingPredictor(Predictor):
         self.report_df = df
 
         return self.calculate_auc_score(dv_data, predict), None
+
+    def predict_ensemble_proba(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        output = model.predict_proba(ev_data)
+
+        predict = pd.DataFrame(output).ix[:,1:]
+        predict.columns = [['predict']]
+        predict.index = paramater.index
+        df = pd.concat([paramater, predict],axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
+        self.report_df = pd.concat([self.report_df, df], axis=0)\
+                         if self.report_df is not None else df
+
+        # return self.calculate_auc_score(dv_data, predict),\
+        #                                 model.feature_importances_
+        return None, None
