@@ -16,6 +16,7 @@ class Predictor(object):
     model_type = None
     is_new_df = None
     report_df = None
+    __THRESHOLD = 0.7
 
     def __init__(self, pv, v, model_type):
         self.predict_ver = pv
@@ -120,6 +121,20 @@ class Predictor(object):
         # return self.calculate_auc_score(dv_data, predict),\
         #                                 model.feature_importances_
         return None, None
+
+    def export_binary_report(self, version, sorting=True):
+        # 確率で出力されたのものを閾値を元に変換し、0-1予測にする
+        if self.is_new_df is not None and\
+           self.is_modified_df is not None and\
+           self.report_df is not None:
+            self.report_df.loc[:, 'predict'] = self.report_df.apply(lambda x: 1 if x.predict >= self.__THRESHOLD else 0,axis=1)
+            self.report_df = pd.concat([self.report_df, self.is_new_df], axis=1)
+            self.report_df = pd.concat([self.report_df, self.is_modified_df], axis=1)
+            if sorting:
+                self.report_df = self.report_df.sort_values(by='predict', ascending=False)
+            if EXECUTION_MODE == 'logging':
+                self.report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
+            return self.report_df
 
 class RFPredictor(Predictor):
     def __init__(self, pv, v, model_type):
