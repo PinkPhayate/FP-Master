@@ -59,8 +59,9 @@ def predict(ver, predict_ver,  alike_metrics):
         if predictor is None:
             print(' predictor has not found, type: ' + PRED_TYPE)
             return
-        sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-        X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
+        # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+        # X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
+        X_resampled, y_resampled = training_m.product_df.as_matrix(), training_m.fault.as_matrix()
         model = predictor.train_model( X_resampled, y_resampled )
         nml_value, importance = predictor.predict_test_data(model, evaluate_m.product_df, evaluate_m.fault, TARGET + "-ex1nml.csv")
         predictor.set_is_new_df(evaluate_m.isNew)
@@ -69,6 +70,7 @@ def predict(ver, predict_ver,  alike_metrics):
         if report_df is not None:
             nml_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             nml_analyzer.calculate()
+            nml_analyzer.analyze_predict_result()
 
 
         # RFN MODEL
@@ -83,6 +85,7 @@ def predict(ver, predict_ver,  alike_metrics):
         if report_df is not None:
             rfn_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             rfn_analyzer.calculate()
+            rfn_analyzer.analyze_predict_result()
 
         # INTELLIGENCE MODEL
         predictor = predictor_rep.get_predictor('ITG', PRED_TYPE)
@@ -98,6 +101,7 @@ def predict(ver, predict_ver,  alike_metrics):
         if report_df is not None:
             itg_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             itg_analyzer.calculate()
+            itg_analyzer.analyze_predict_result()
 
     # export report
     nml_df = nml_analyzer.calculate_average(ITER)
@@ -105,6 +109,13 @@ def predict(ver, predict_ver,  alike_metrics):
     itg_df = itg_analyzer.calculate_average(ITER)
     df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True)
     nml_analyzer.export(target_sw=TARGET, df=df, predictor_type=PRED_TYPE)    # どのanalyzerクラスでも良い
+
+    nml_df = nml_analyzer.calculate_num_report_averge(ITER)
+    nml_analyzer.export_count_report(target_sw=TARGET, df=nml_df, predictor_type=PRED_TYPE)
+    rfn_df = rfn_analyzer.calculate_num_report_averge(ITER)
+    rfn_analyzer.export_count_report(target_sw=TARGET, df=rfn_df, predictor_type=PRED_TYPE)
+    itg_df = itg_analyzer.calculate_num_report_averge(ITER)
+    itg_analyzer.export_count_report(target_sw=TARGET, df=itg_df, predictor_type=PRED_TYPE)
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)

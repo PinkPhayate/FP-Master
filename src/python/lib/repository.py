@@ -1,6 +1,5 @@
 from lib.predictor import RFPredictor, LGPredictor, SVCPredictor
-from lib.predictor import TreePredictor, SVRPredictor
-
+from lib.predictor import TreePredictor, SVRPredictor, BoostingPredictor
 class PredictorRepository(object):
     def __init__(self, predict_ver, ver):
         self.predict_ver = predict_ver
@@ -17,4 +16,7 @@ class PredictorRepository(object):
             return TreePredictor(self.predict_ver, self.ver, model_type)
         if predictor_type == 'svr':
             return SVRPredictor(self.predict_ver, self.ver, model_type)
+        if predictor_type == 'bst':
+            return BoostingPredictor(self.predict_ver, self.ver, model_type)
+
         return None

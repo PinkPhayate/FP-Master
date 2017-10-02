@@ -26,15 +26,15 @@ TARGET = ''
 args = sys.argv
 ITER = int(args[2]) if (len(args)>2) else (2000)
 PRED_TYPE = str(args[3]) if (len(args)>3) else (2000)
-
+PRED_TYPE2 = str(args[4]) if (len(args)>4) else PRED_TYPE
 
 def predict(ver, predict_ver,  alike_metrics):
-    predictor_rep = PredictorRepository(predict_ver, ver)
 
     training_m = Metrics_Origin(ver, METRICS_DIR)
     evaluate_m = Metrics_Origin(predict_ver, METRICS_DIR)
+    ens_analyzer = Analyzer(predict_ver, 'ENS')
 
-    ens_analyzer = AUCAnalyzer(predict_ver, 'ENS', TARGET)
+    predictor_rep = PredictorRepository(predict_ver, ver)
 
     for i in tqdm(range(ITER)):
         # NML MODEL
@@ -42,33 +42,36 @@ def predict(ver, predict_ver,  alike_metrics):
         if predictor is None:
             print(' predictor has not found, type: ' + PRED_TYPE)
             return
-        # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-        # X_resampled, y_resampled = sm.fit_sample(training_m.product_df, training_m.fault)
-        X_resampled, y_resampled = training_m.product_df.as_matrix(), training_m.fault.as_matrix()
-        nml_model = predictor.train_model(X_resampled, y_resampled)
-        ev_data, dv_data = evaluate_m.get_not_modified_df()
-        nml_value, _ = predictor.predict_ensemble_test_data(nml_model, ev_data, dv_data, None)
-
-        # RFN MODEL
         sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-        X_resampled, y_resampled = sm.fit_sample(training_m.mrg_df, training_m.fault)
-        rfn_model = predictor.train_model(X_resampled, y_resampled)
+        X_resampled, y_resampled = sm.fit_sample(training_m.product_df, training_m.fault)
+        model = predictor.train_model(X_resampled, y_resampled)
+        ev_data, dv_data = evaluate_m.get_not_modified_df()
+        nml_value, _ = predictor.predict_ensemble_proba(model, ev_data, dv_data, None)
+
+
+
+        # DST MODEL
+        predictor2 = predictor_rep.get_predictor('ENS', PRED_TYPE2)
+        if predictor2 is None:
+            print(' predictor has not found, type: ' + PRED_TYPE2)
+            return
+        sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+        X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
+        model = predictor2.train_model( X_resampled, y_resampled )
         ev_data, dv_data = evaluate_m.get_modified_df()
-        mrg_value, _ = predictor.predict_ensemble_test_data(rfn_model, ev_data, dv_data, None)
-        predictor.set_is_new_df(evaluate_m.isNew)
-        predictor.set_is_modified_df(evaluate_m.isModified)
-        report_df = predictor.export_report(predict_ver)
-        report_df[REPORT_COLUMNS].to_csv('df.csv')
+        mrg_value, _ = predictor2.predict_ensemble_proba(model, ev_data, dv_data, None)
+        predictor2.set_is_new_df(evaluate_m.isNew)
+        predictor2.set_is_modified_df(evaluate_m.isModified)
+        report_df = predictor2.export_report(predict_ver)
         if report_df is not None:
             ens_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             ens_analyzer.calculate()
-            ens_analyzer.analyze_predict_result()
 
     # export report
     ens_df = ens_analyzer.calculate_average(ITER)
+    predictor_type_name = "{0}{1}".format(PRED_TYPE, PRED_TYPE2)
     ens_analyzer.export(target_sw=TARGET, df=ens_df, predictor_type=PRED_TYPE)
-    ens_df = ens_analyzer.calculate_num_report_averge(ITER)
-    ens_analyzer.export_count_report(target_sw=TARGET, df=ens_df, predictor_type=PRED_TYPE)
+    ens_analyzer.export_accum_df(target_sw=TARGET)
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)
