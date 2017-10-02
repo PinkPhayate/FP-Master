@@ -24,6 +24,7 @@ def wrapper_exp(arg1, arg2):
     rep.exp(arg1, arg2)
 
 def main():
+    start = time.time()
     derby_tuple = (('10.8', '10.9'), ('10.9', '10.10'))
     solr_tuple  = (('4.1.0', '4.2.0'),
                    ('4.2.0', '4.3.0'),
@@ -47,6 +48,9 @@ def main():
         jobs.append(job)
         job.start()
 
+    [job.join() for job in jobs]
+    elapsed_time = time.time() - start
+    print ("elapsed_time:{0}".format(elapsed_time) + "[sec]")
 
 if __name__ == '__main__':
     main()

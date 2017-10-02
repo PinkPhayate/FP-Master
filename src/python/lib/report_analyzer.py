@@ -308,6 +308,8 @@ class AUCAnalyzer(Analyzer):
 
     def count_fp_num(self, df):
         fp_df = df[df.apply(lambda x: x['predict'] == 1, axis=1)]
+        if len(fp_df) == 0:
+            return 0,0
         correct_df = fp_df[fp_df.apply(lambda x: x['actual'] == 1, axis=1)]
         return len(fp_df), len(correct_df)
 
