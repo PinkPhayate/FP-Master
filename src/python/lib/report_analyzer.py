@@ -163,6 +163,8 @@ class Analyzer(object):
 
     def export(self, target_sw, df, predictor_type):
         report_file_name = REPORT_DIR + target_sw+'-' +predictor_type+'.csv'
+        print(df)
+        # raise Exception
         df.columns = self.COLUMNS
         if 5 < len(df):
             df = df.ix[[1,3,5], :]
@@ -274,6 +276,20 @@ class AUCAnalyzer(Analyzer):
         precision = skm.precision_score(y_true=__df[['actual']],
                                         y_pred=__df[['predict']])
         return recall, accuracy, precision
+
+    def calculate_3indictor(self, __df):
+        if __df[['actual']].sum()[0] < 1:
+            return 0, 0, 0
+        if __df[['predict']].sum()[0] < 1:
+            return 0, 0, 0
+
+        recall = skm.recall_score(y_true=__df[['actual']],
+                                  y_pred=__df[['predict']])
+        accuracy = skm.accuracy_score(y_true=__df[['actual']],
+                                      y_pred=__df[['predict']])
+        f1 = skm.f1_score(y_true=__df[['actual']],
+                                        y_pred=__df[['predict']])
+        return recall, accuracy, f1
 
     def calculate_0(self):
         __df = self.report_df.copy()
