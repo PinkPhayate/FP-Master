@@ -1,6 +1,7 @@
 import lxml
 from bs4 import BeautifulSoup
 from os import path
+import sys
 from urllib import request
 import lxml
 import configparser
@@ -14,7 +15,14 @@ ENV = inifile.get('env', 'locale')
 PATCH_DOMAIN_URL = 'https://issues.apache.org'
 MODULE_POST_STRING = '.java'
 METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/Solr/bug'
-skip_array = []
+skip_array = ['v6.5.1', 'v1.1.0', 'v4.10.3', 'v4.5.0', 'v4.10.4',
+              'v4.0.0-alpha', 'v6.6.0', 'v3.1.0', 'v4.0.0-beta',
+              'v1.4.0', 'v4.4.0',
+              'v4.2.0', 'v5.3.0', 'v4.10.2', 'v5.3.1', 'v5.5.0', 'v5.4.1',
+              'v3.6.0', 'v1.2.bug_fixes', 'v4.3.1', 'v3.5.0', 'v6.4.1',
+              'v4.10.0', 'v7.0.1', 'v6.1.0', 'v6.2.0', 'v4.7.2', 'v6.4.2',
+              'v4.7.0', 'v5.0.0', 'v5.1.0', 'v6.2.1', 'v3.4.0', 'v4.0.0',
+              'v4.10.1', 'v4.6.0', 'v3.6.2', 'v5.2.1', 'v4.7.1', 'v4.9.0']
 
 def skip_version(url_json):
     popped_url_json = url_json.copy()
@@ -23,14 +31,19 @@ def skip_version(url_json):
             del popped_url_json[version]
     return popped_url_json
 
+def select_specified_version(url_json, specifed_version):
+    new_json = {}
+    new_json[specifed_version] = url_json[specifed_version]
+    return new_json
+
 def export_bug_modules(version, module_set):
-    filename = '{}/slr_{}_bgmd.csv'.format(METRICS_DIR, version)
+    filename = '{}/slr_{}_bgmd.csv'.format(METRICS_DIR, version[1:])
     with open(filename, mode='w', encoding='utf-8') as fh:
         for module in module_set:
             fh.write('{}\n'.format(module))
 
 def export_error_log(lines):
-    with open('new.fa', mode = 'w', encoding = 'utf-8') as fh:
+    with open('./log/export_error.log', mode='w', encoding='utf-8') as fh:
         for line in lines:
             fh.write('{}\n'.format(line))
 
@@ -54,7 +67,8 @@ def get_fixed_bug_url(url):
                 url_dict[version_num] = url_list
     return url_dict
 
-def get_patch_file_url(source):
+def get_patch_file_url(url):
+    source = request.urlopen(url)
     soup = BeautifulSoup(source, "lxml")
     patch_urls = []
     for div in soup.findAll("div", attrs={"attachment-thumb"}):
@@ -78,6 +92,7 @@ def extract_bug_module_name(patch_url):
     def __extract_module_name(line):
         module_name = line.split(' ')[1]
         return module_name.rsplit(MODULE_POST_STRING)[0] + MODULE_POST_STRING
+
     source = request.urlopen(patch_url)
     lines = source.readlines()
     modules = []
@@ -95,20 +110,25 @@ def extract_bug_module_name(patch_url):
     return modules
 
 def find_bug_module(url):
-    source = request.urlopen(url)
     bug_module_map = []
-    patch_urls = get_patch_file_url(source)
+    try:
+        patch_urls = get_patch_file_url(url)
+    except:
+        print('this bug report couldnt be read patch files, url: {}'
+              .format(url))
+        return []
     for patch_url in patch_urls:
         patch_url = '{}/{}'.format(PATCH_DOMAIN_URL, patch_url)
-        modules = extract_bug_module_name(patch_url)
-        bug_module_map.extend(modules)
+        try:
+            modules = extract_bug_module_name(patch_url)
+            bug_module_map.extend(modules)
+        except:
+            print('[ERROR] this patch file could not open: {}'
+                  .format(patch_url))
+
     return list(set(bug_module_map))
 
-
-def main():
-    url = 'https://lucene.apache.org/solr/7_0_1/changes/Changes.html'
-    url_json = get_fixed_bug_url(url)
-    url_json = skip_version(url_json)
+def crawl_versions(url_json):
     print('[INFO] versions: {}'.format(url_json.keys()))
     for version, url_array in url_json.items():
         jobs = []
@@ -124,6 +144,22 @@ def main():
         job.start()
     [job.join() for job in jobs]
 
+def main():
+    url = 'https://lucene.apache.org/solr/7_0_1/changes/Changes.html'
+    url_json = get_fixed_bug_url(url)
+    url_json = skip_version(url_json)
+    crawl_versions(url_json)
+
+def operate_specidied_version(specifed_version):
+    print('crawl bug report of the specified version')
+    url = 'https://lucene.apache.org/solr/7_0_1/changes/Changes.html'
+    origin_json = get_fixed_bug_url(url)
+    url_json = select_specified_version(origin_json, specifed_version)
+    crawl_versions(url_json)
 
 if __name__ == '__main__':
-    main()
+    args = sys.argv
+    if len(args) < 2:
+        main()
+    elif args[1] == 'spec':
+        operate_specidied_version(args[2])
