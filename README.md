@@ -55,3 +55,19 @@ AUCの値を求める
 - AUCの面積の試行回数の平均分を集めたSW-rf.csv
 - 予測確率を試行回数全ての値を保存したacm-pv.csvがある。
 
+
+## Crawler for Apache Solr
+
+###Description
+This progrm extracts file name that is fixed in specidied versions.
+
+### command example
+```
+# Extract in all versions
+python crawler_solr.py
+
+# Extract one just in version 6.6.0
+python crawler_solr.py spec v6.6.0
+
+```
+
