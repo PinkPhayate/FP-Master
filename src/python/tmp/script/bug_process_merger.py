@@ -1,4 +1,4 @@
-import csv
+import csv, re
 import sys
 import pandas as pd
 
@@ -25,8 +25,12 @@ def get_bug_list_solr(bug_filename):
     with open(bug_filename, 'r') as f:
         reader = csv.reader(f)
         for row in reader:
-            bug_list.append(row[0])
-
+            pattern = r"^a/"
+            text = row[0]
+            if re.match(pattern, text):
+                bug_list.append(text[2:])
+            else:
+                bug_list.append(row[0])
     return bug_list
 
 def main(target_sw: str):
