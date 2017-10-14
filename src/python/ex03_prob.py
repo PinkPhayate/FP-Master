@@ -47,7 +47,10 @@ def predict(ver, predict_ver,  alike_metrics):
         model = predictor.train_model(X_resampled, y_resampled)
         ev_data, dv_data = evaluate_m.get_not_modified_df()
         nml_value, _ = predictor.predict_ensemble_proba(model, ev_data, dv_data, None)
-
+        predictor.set_is_new_df(evaluate_m.isNew)
+        predictor.set_is_modified_df(evaluate_m.isModified)
+        non_mdf_report_df = predictor.export_report(predict_ver)
+        non_mdf_report_df.dropna(inplace=True)
 
 
         # DST MODEL
@@ -62,7 +65,9 @@ def predict(ver, predict_ver,  alike_metrics):
         mrg_value, _ = predictor2.predict_ensemble_proba(model, ev_data, dv_data, None)
         predictor2.set_is_new_df(evaluate_m.isNew)
         predictor2.set_is_modified_df(evaluate_m.isModified)
-        report_df = predictor2.export_report(predict_ver)
+        mdf_report_df = predictor2.export_report(predict_ver)
+        mdf_report_df.dropna(inplace=True)
+        report_df = pd.concat([non_mdf_report_df, mdf_report_df], axis=0)
         if report_df is not None:
             ens_analyzer.set_report_df(report_df[REPORT_COLUMNS])
             ens_analyzer.calculate()
