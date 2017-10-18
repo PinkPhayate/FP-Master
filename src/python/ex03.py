@@ -39,9 +39,10 @@ def predict(ver, predict_ver,  alike_metrics):
     for i in tqdm(range(ITER)):
         # NML MODEL
         predictor = predictor_rep.get_predictor('ENS', PRED_TYPE)
+        print('non modified modules type: {}'.format(PRED_TYPE))
         if predictor is None:
             print(' predictor has not found, type: ' + PRED_TYPE)
-            return
+            raise Exception
         sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample(training_m.product_df, training_m.fault)
         model = predictor.train_model(X_resampled, y_resampled)
@@ -54,9 +55,10 @@ def predict(ver, predict_ver,  alike_metrics):
 
         # DST MODEL
         predictor2 = predictor_rep.get_predictor('ENS', PRED_TYPE2)
+        print('modified modules type: {}'.format(PRED_TYPE2))
         if predictor2 is None:
             print(' predictor has not found, type: ' + PRED_TYPE2)
-            return
+            raise Exception
         sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
         X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
         model = predictor2.train_model( X_resampled, y_resampled )

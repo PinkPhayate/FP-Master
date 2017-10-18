@@ -1,5 +1,6 @@
 import pandas as pd
 from lib.auc import AUC
+from sklearn.metrics import roc_auc_score
 import sklearn.metrics as skm
 from sklearn.exceptions import UndefinedMetricWarning
 import configparser
@@ -83,7 +84,8 @@ class Analyzer(object):
         pred.reset_index(drop=True, inplace=True)
         df = pd.concat([actual, pred], axis=1)
         df.columns = ['fault', 'ev_value']
-        diagram_value = AUC(df). circulate_auc
+        # diagram_value = AUC(df). circulate_auc
+        diagram_value = roc_auc_score(actual, pred)
         return diagram_value
 
     def calculate_0(self):
@@ -271,7 +273,7 @@ class AUCAnalyzer(Analyzer):
 
         recall = skm.recall_score(y_true=__df[['actual']],
                                   y_pred=__df[['predict']])
-        accuracy = skm.accuracy_score(y_true=__df[['actual']],
+        accuracy = skm.f1_score(y_true=__df[['actual']],
                                       y_pred=__df[['predict']])
         precision = skm.precision_score(y_true=__df[['actual']],
                                         y_pred=__df[['predict']])
