@@ -474,3 +474,30 @@ class AUCAnalyzer(Analyzer):
             report_df = pd.DataFrame([])
         report_df = pd.concat([report_df, df], axis=0, ignore_index=True,)
         report_df.to_csv(report_file_name)
+
+    def export_all_values(self):
+        report_file_name = '{0}{1}{2}-{3}-all_values.csv'\
+            .format(REPORT_DIR, self.target_sw, self.predict_version,
+                    self.model_type)
+
+        exported_df = pd.DataFrame(self.accum_precision0)
+        df = pd.DataFrame(self.accum_recall0)
+        exported_df = pd.concat([exported_df, df], axis=1)
+        df = pd.DataFrame(self.accum_accuracy0)
+        exported_df = pd.concat([exported_df, df], axis=1)
+        df = pd.DataFrame(self.accum_recall2)
+        exported_df = pd.concat([exported_df, df], axis=1)
+        df = pd.DataFrame(self.accum_precision2)
+        exported_df = pd.concat([exported_df, df], axis=1)
+        df = pd.DataFrame(self.accum_accuracy2)
+        exported_df = pd.concat([exported_df, df], axis=1)
+        df = pd.DataFrame(self.accum_recall3)
+        exported_df = pd.concat([exported_df, df], axis=1)
+        df = pd.DataFrame(self.accum_precision3)
+        exported_df = pd.concat([exported_df, df], axis=1)
+        df = pd.DataFrame(self.accum_accuracy3)
+        exported_df = pd.concat([exported_df, df], axis=1)
+        exported_df.header = [['precision0', 'recall0', 'accuracy0',
+                               'precision1', 'recall2', 'accuracy2',
+                               'precision3', 'recall3', 'accuracy3']]
+        exported_df.to_csv(report_file_name)

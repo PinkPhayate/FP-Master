@@ -112,10 +112,13 @@ def predict(ver, predict_ver,  alike_metrics):
 
     nml_df = nml_analyzer.calculate_num_report_averge(ITER)
     nml_analyzer.export_count_report(target_sw=TARGET, df=nml_df, predictor_type=PRED_TYPE)
+    nml_analyzer.export_all_values()
     rfn_df = rfn_analyzer.calculate_num_report_averge(ITER)
     rfn_analyzer.export_count_report(target_sw=TARGET, df=rfn_df, predictor_type=PRED_TYPE)
+    rfn_analyzer.export_all_values()
     itg_df = itg_analyzer.calculate_num_report_averge(ITER)
     itg_analyzer.export_count_report(target_sw=TARGET, df=itg_df, predictor_type=PRED_TYPE)
+    itg_analyzer.export_all_values()
 
 def exp(v1, v2):
     version1 = Metrics_Origin(v1, METRICS_DIR)
