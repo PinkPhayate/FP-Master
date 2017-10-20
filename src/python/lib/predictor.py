@@ -261,7 +261,9 @@ class BoostingPredictor(Predictor):
         from sklearn.ensemble import GradientBoostingClassifier
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
-        model = GradientBoostingClassifier()
+        model = GradientBoostingClassifier(min_samples_leaf=5,
+                                           learning_rate=0.3,
+                                           max_depth=5)
         model.fit(ev_data, column_or_1d(dv_data))
 
         return model
