@@ -42,7 +42,8 @@ def main(target_sw: str):
         bug_list = get_bug_list_solr(bug_filename)
         df['fileName'] = df.apply(lambda x: x['fileName'].split("/")[6:], axis=1)
     else:
-        return
+        bug_list = get_bug_list_solr(bug_filename)
+        df['fileName'] = df.apply(lambda x: x['fileName'].split("/")[9:], axis=1)
 
     print("bug count:  " + str(len(bug_list)))
 
@@ -60,5 +61,6 @@ if __name__ == '__main__':
     bug_filename = args[1]
     process_m_filename = args[2]
     save_filename = args[3]
-    target_sw = args[4] # derby or solr
+    # derby or solr
+    target_sw = args[4] if 4 < len(args) else None
     main(target_sw)
