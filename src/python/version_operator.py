@@ -18,8 +18,9 @@ def get_exp_versions():
 
 def models_creator():
     version_datas = get_exp_versions()
-    models = []
+    model_dictionary = {}
     for version_data in version_datas:
+        models = []
         for version in version_data:
             model = EXP_MODEL(sw=version_data["sw"],
                               fv=version["v"],
@@ -28,7 +29,8 @@ def models_creator():
                               cv=version["diffv"][1],
                               dn=version_data["dirname"])
             models.append(model)
-    return models
+        model_dictionary[ version_data["sw"] ] = models
+    return model_dictionary
 
 def adjust_bug_list(model):
     def __get_bug_list(bug_filename):
