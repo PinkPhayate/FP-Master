@@ -17,13 +17,6 @@ def get_logger():
     report_logger = getLogger("report_log")
     return report_logger, error_logger
 
-def create_module_directory():
-    model = stub.get_derby_model()
-    query = """mkdir -p {}/{}"""\
-            .format(METRICS_DIR, model.sw_name)
-    res = subprocess.check_call(query, shell=True)
-
-
 def exe_DIMA(model):
     """
     プロセスメトリクスを取得するモジュール
@@ -45,15 +38,15 @@ def exe_DIMA(model):
         report_logger.info('execute this query: {}'.format(query))
         res = subprocess.check_output(query, shell=True)
         report_logger.info(res)
-        report_logger.info('done collectly)
+        report_logger.info('done collectly')
 
         query = """mv ProcessMetrics-{}.csv {}/{}/process_test/"""\
                 .format(model.final_version, METRICS_DIR, model.sw_name)
         report_logger.info('execute this query: {}'.format(query))
         subprocess.check_call(query, shell=True)
-        report_logger.info('done collectly)
+        report_logger.info('done collectly')
     except:
-        report_logger.info('could not executed collectly)
+        report_logger.info('could not executed collectly')
 
 
 def config_logger():
@@ -86,15 +79,19 @@ def restrict_models(model_dict):
 
 
 def main():
+    from Model import model_creator
+    import version_operator as vo
     config_logger()
-    model_dict = version_operator.models_creator()
-    model_dict = restrict_models(model_dict)
-    for sw_name, models in url_json.items():
+    model_dict = model_creator.get_model_dictionary()
+    # model_dict = restrict_models(model_dict)
+    for sw_name, models in model_dict.items():
+        print(sw_name)
         for model in models:
             """
             ここに実行する実験メソッドを書けば良い
             """
-            exe_DIMA(model)
+            vo.adjust_bug_list(model)
+            # exe_DIMA(model)
 
 if __name__ == '__main__':
     main()
