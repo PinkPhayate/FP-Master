@@ -4,6 +4,7 @@ from Model import stub
 import configparser
 from logging import getLogger
 import version_operator
+from multiprocessing import Process
 
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
@@ -38,13 +39,13 @@ def exe_DIMA(model):
         report_logger.info('execute this query: {}'.format(query))
         res = subprocess.check_output(query, shell=True)
         report_logger.info(res)
-        report_logger.info('done collectly')
+        report_logger.info('execution has done collectly: {}'.format(query))
 
         query = """mv ProcessMetrics-{}.csv {}/{}/process_test/"""\
                 .format(model.final_version, METRICS_DIR, model.sw_name)
         report_logger.info('execute this query: {}'.format(query))
         subprocess.check_call(query, shell=True)
-        report_logger.info('done collectly')
+        report_logger.info('execution has done collectly: {}'.format(query))
     except:
         report_logger.info('could not executed collectly')
 
@@ -83,6 +84,7 @@ def main():
     import version_operator as vo
     config_logger()
     model_dict = model_creator.get_model_dictionary()
+    jobs = []
     # model_dict = restrict_models(model_dict)
     for sw_name, models in model_dict.items():
         print(sw_name)
@@ -90,8 +92,12 @@ def main():
             """
             ここに実行する実験メソッドを書けば良い
             """
-            vo.adjust_bug_list(model)
-            # exe_DIMA(model)
+            # vo.adjust_bug_list(model)
+        job = Process(target=exe_DIMA, args=(model))
+        jobs.append(job)
+        job.start()
+    [jb.join() for jb in jobs]
+
 
 if __name__ == '__main__':
     main()
