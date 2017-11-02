@@ -49,7 +49,13 @@ def merge_process_product(model):
     res = subprocess.check_output(query, shell=True)
     print(res)
 
+def test_get_exp_versions():
+    from Model import model_creator
+    model_dict = model_creator.get_model_dictionary()
+    print(model_dict)
+
 model = stub.get_derby_model()
 # test_export_process_metrics(model)
 # test_export_process_bug_report(model)
-merge_process_product(model)
+# merge_process_product(model)
+test_get_exp_versions()

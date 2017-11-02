@@ -93,9 +93,12 @@ def main():
             ここに実行する実験メソッドを書けば良い
             """
             # vo.adjust_bug_list(model)
-        job = Process(target=exe_DIMA, args=(model))
-        jobs.append(job)
-        job.start()
+            job = Process(target=exe_DIMA, args=(model))
+            jobs.append(job)
+            job.start()
+            """
+            このインデントを維持する。
+            """
     [jb.join() for jb in jobs]
 
 
