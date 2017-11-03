@@ -18,10 +18,10 @@ def get_derby_bug_adjust_model():
     return model
 
 def get_bug_process_merge_stub():
-    model = EXP_MODEL(sw='poi',
-                      fv='3.15',
+    model = EXP_MODEL(sw='velocity',
+                      fv='1.6',
                       bvs=None,
                       pv=None,
                       cv=None,
-                      dn='ApachePoi')
+                      dn='ApacheVelocity')
     return model

@@ -5,6 +5,7 @@ SRC_DIR = "/Users/phayate/src"
 METRICS_DIR = "/Users/phayate/Dropbox/STUDY/Metrics"
 DIMA_PATH = METRICS_DIR + "/DIMA-2.4.jar"
 MO_PATH = METRICS_DIR + "/MO-1.1.jar"
+LOG_DIR = METRICS_DIR
 
 def test_export_process_metrics(model):
     arg1 = "{}/{}/{}".format(SRC_DIR, model.dir_name, model.curr_version)
@@ -24,7 +25,7 @@ def test_export_process_metrics(model):
         #  TODO; exxception handler
 
 def test_export_process_bug_report(model):
-    import exp_executions
+    import exp_execution
     exp_execution.export_process_bug_report(model)
 
 
@@ -49,5 +50,19 @@ def test_get_exp_versions():
 # merge_process_product(model)
 # test_get_exp_versions()
 
+def config_logger():
+    import logging
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    sh = logging.StreamHandler()
+    sh.setFormatter(formatter)
+
+    debug_logger = logging.getLogger("debug_log")
+    debug_logger.addHandler(sh)
+    debug_logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(filename=LOG_DIR+"debug.log")
+    fh.setFormatter(formatter)
+    debug_logger.addHandler(fh)
+
+config_logger()
 model = stub.get_bug_process_merge_stub()
 test_export_process_bug_report(model)

@@ -10,8 +10,10 @@ METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
 config_file = METRICS_DIR + '/exp_config.json'
 
 def get_logger():
+    mode = inifile.get('env', 'mode')
+    logger = 'debug' if mode == 'debug' else 'report'
     error_logger = getLogger("error_log")
-    report_logger = getLogger("report_log")
+    report_logger = getLogger(logger+"_log")
     return report_logger, error_logger
 
 def get_exp_versions():

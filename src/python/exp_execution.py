@@ -14,8 +14,10 @@ SRC_DIR = "/Users/phayate/src"
 LOG_DIR = METRICS_DIR
 
 def get_logger():
+    mode = inifile.get('env', 'mode')
+    logger = 'debug' if mode == 'debug' else 'report'
+    report_logger = getLogger(logger+"_log")
     error_logger = getLogger("error_log")
-    report_logger = getLogger("report_log")
     return report_logger, error_logger
 
 def exe_DIMA(model):
