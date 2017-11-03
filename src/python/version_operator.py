@@ -1,5 +1,6 @@
 import configparser
 import json, csv
+from logging import getLogger
 from Model.exp_model import EXP_MODEL
 
 inifile = configparser.SafeConfigParser()
@@ -7,6 +8,11 @@ inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
 METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
 config_file = METRICS_DIR + '/exp_config.json'
+
+def get_logger():
+    error_logger = getLogger("error_log")
+    report_logger = getLogger("report_log")
+    return report_logger, error_logger
 
 def get_exp_versions():
     raise Exception
@@ -47,12 +53,17 @@ def get_bug_list(bug_filename):
         for row in reader:
             bug_list.append(row[0])
         return bug_list
+def transform_sol1(bug_module, sw_name):
+    beginning_str = "/{}/".format(sw_name)
+    soluted_bug_module = bug_module.split(beginning_str)[-1]
+    return soluted_bug_module
 
 def get_bug_list_sol1(bug_filename, sw_name):
     '''
     sol1でバグリストを整形する
     sol1: そのソフトウェア名以下のパスから最後までをパスとする手法
     '''
+    report_logger, error_logger = get_logger()
     bug_list = get_bug_list(bug_filename)
     beginning_str = "/{}/".format(sw_name)
     soluted_bug_list = []
@@ -63,6 +74,7 @@ def get_bug_list_sol1(bug_filename, sw_name):
             soluted_bug_list.append(soluted_bug_module)
         else:
             exc_bug_list.append(bug_module)
+    report_logger.info('reduction of numbug module via soli1 {}/{}'.format(len(bug_list), len(soluted_bug_list)))
     return soluted_bug_list, exc_bug_list
 
 def adjust_bug_list(model):
@@ -73,7 +85,6 @@ def adjust_bug_list(model):
         with open(ad_bug_filename, 'w') as f:
             for x in ad_bug_list:
                 f.write(str(x) + "\n")
-
 
     def __merge_bug_list(sw_name, versions):
         ad_bug_list = []

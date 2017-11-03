@@ -49,6 +49,42 @@ def exe_DIMA(model):
     except:
         report_logger.info('could not executed collectly')
 
+def export_process_bug_report(model):
+    '''
+    solution1(sw名より以下のモジュール名を取得)の場合、
+    いくつのバグレポートがマージされずに終わるか
+    '''
+    import pandas as pd
+    import version_operator as vo
+    report_logger, error_logger = get_logger()
+    # バグレポート名
+    arg1 = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    # プロセスメトリクスレポート名
+    arg2 = "{0}/{1}/process/ProcessMetrics-{2}.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    # 出力ファイル名
+    arg3 = "{0}/{1}/process-bug/process-bug-{2}.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    # バグモジュールの書かれたリストを取得
+    bug_list, exc_bug_list = vo.get_bug_list_sol1(arg1, model.sw_name)
+    error_str = '{} {}, excepted bug modules: {}'\
+        .format(model.sw_name, model.final_version, exc_bug_list)
+    if 0 < len(exc_bug_list):
+        error_logger.error(error_str)
+    # プロセスメトリクスのcsvを読み込み
+    df = pd.read_csv(arg2, header=0)
+    df['fileName'] = df.apply(lambda x: x['fileName'].split("/")[9:], axis=1)
+    df['fileName'] = df.apply(lambda x: "/".join(x['fileName']), axis=1)
+    df['fileName'] = df.apply(lambda x: vo.transform_sol1(x['fileName'], model.sw_name), axis=1)
+    df['bug'] = df.apply(lambda x: 1 if(x['fileName'] in bug_list) else 0, axis=1)
+    # bug number is integer
+    # df['bug'] = df.apply(lambda x: bug_list.count(x['fileName']), axis=1)
+    found = df['bug'].sum()
+    result_str = '{} {}, bef/after {}/{}'\
+        .format(model.sw_name, model.final_version, len(bug_list), found)
+    report_logger.info(result_str)
+    df.to_csv(arg3)
 
 def config_logger():
     import logging

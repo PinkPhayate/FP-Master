@@ -48,10 +48,12 @@ def main(target_sw: str):
     print("bug count:  " + str(len(bug_list)))
 
     df['fileName'] = df.apply(lambda x: "/".join(x['fileName']), axis=1)
+    print(df['fileName'])
+    raise Exception
     # bug number is binary
-    # df['bug'] = df.apply(lambda x: 1 if(x['fileName'] in bug_list) else 0, axis=1)
+    df['bug'] = df.apply(lambda x: 1 if(x['fileName'] in bug_list) else 0, axis=1)
     # bug number is integer
-    df['bug'] = df.apply(lambda x: bug_list.count(x['fileName']), axis=1)
+    # df['bug'] = df.apply(lambda x: bug_list.count(x['fileName']), axis=1)
     found = df['bug'].sum()
     print("found bug: " + str(found))
     df.to_csv(save_filename)

@@ -24,19 +24,9 @@ def test_export_process_metrics(model):
         #  TODO; exxception handler
 
 def test_export_process_bug_report(model):
-    # バグレポート名
-    arg1 = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
-            .format(METRICS_DIR, model.sw_name, model.final_version)
-    # プロセスメトリクスレポート名
-    arg2 = "{0}/{1}/process/ProcessMetrics-{2}.csv"\
-            .format(METRICS_DIR, model.sw_name, model.final_version)
-    # 出力ファイル名
-    arg3 = "{0}/{1}/process-bug/process-bug-{2}.csv"\
-            .format(METRICS_DIR, model.sw_name, model.final_version)
-    query = """python ./tmp/script/bug_process_merger.py {} {} {}"""\
-            .format(arg1, arg2, arg3)
-    res = subprocess.check_output(query, shell=True)
-    print(res)
+    import exp_executions
+    exp_execution.export_process_bug_report(model)
+
 
 def merge_process_product(model):
     arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
@@ -54,8 +44,10 @@ def test_get_exp_versions():
     model_dict = model_creator.get_model_dictionary()
     print(model_dict)
 
-model = stub.get_derby_model()
+# model = stub.get_derby_model()
 # test_export_process_metrics(model)
-# test_export_process_bug_report(model)
 # merge_process_product(model)
-test_get_exp_versions()
+# test_get_exp_versions()
+
+model = stub.get_bug_process_merge_stub()
+test_export_process_bug_report(model)

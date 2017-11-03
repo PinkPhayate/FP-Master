@@ -34,19 +34,24 @@ def test_get_bug_list():
 
 def test_get_bug_list_sol1(model):
     # TODO: 全Swでテストする
-    sw_name = model.sw_name
-    final_version = model.final_version
+    # solutionがいくつのバグモジュールを無効にしてしまうか
+    sw_name = 'poi'
+    final_version = '3.15'
+    print('sw: {}   version: {}'.format(sw_name, final_version))
     filename = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
         .format(METRICS_DIR, sw_name, final_version)
     bug_list, exc_bug_list = vo.get_bug_list_sol1(filename, sw_name)
-    print('{}   {}').format(sw_name, final_version)
-    print(exc_bug_list)
+    print(bug_list, exc_bug_list)
 
-def test_merge_bug_process():
+def test_merge_bug_process(model):
     # TODO: 実装
     pass
+    sw_name = 'poi'
+    final_version = '3.15'
+    print('sw: {}   version: {}'.format(sw_name, final_version))
 
 model = stub.get_derby_bug_adjust_model()
 # test_adjust_bug_list(model)
 # test_get_bug_list()
-get_process_metrics(model)
+# get_process_metrics(model)
+test_get_bug_list_sol1(model)
