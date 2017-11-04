@@ -9,6 +9,7 @@ METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
 config_file = METRICS_DIR + '/exp_config.json'
 
 def get_exp_versions():
+    print(config_file)
     f = open(config_file, 'r')
     jsonData = json.load(f)
     f.close()

@@ -10,7 +10,7 @@ inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
 METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
-SRC_DIR = "/Users/phayate/src"
+SRC_DIR = "/Users/kishi-lab/Phayate/SW"
 LOG_DIR = METRICS_DIR
 
 def get_logger():
@@ -41,7 +41,7 @@ def exe_DIMA(model):
         report_logger.info(res)
         report_logger.info('execution has done collectly: {}'.format(query))
 
-        query = """mv ProcessMetrics-{}.csv {}/{}/process_test/"""\
+        query = """mv ProcessMetrics-{}.csv {}/{}/process/"""\
                 .format(model.final_version, METRICS_DIR, model.sw_name)
         report_logger.info('execute this query: {}'.format(query))
         subprocess.check_call(query, shell=True)
@@ -93,7 +93,7 @@ def main():
             ここに実行する実験メソッドを書けば良い
             """
             # vo.adjust_bug_list(model)
-        job = Process(target=exe_DIMA, args=(model))
+        job = Process(target=exe_DIMA, args=(model,))
         jobs.append(job)
         job.start()
     [jb.join() for jb in jobs]
