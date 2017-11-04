@@ -116,6 +116,13 @@ def restrict_models(model_dict):
             del model_dict_copy[version]
     return model_dict_copy
 
+def retrieb_models(model_dict):
+    target_array = ['poi']
+    model_dict_copy = {}
+    for version in model_dict.keys():
+        if version in target_array:
+            model_dict_copy[version] = model_dict[version]
+    return model_dict_copy
 
 def main():
     from Model import model_creator
@@ -123,7 +130,7 @@ def main():
     config_logger()
     model_dict = model_creator.get_model_dictionary()
     jobs = []
-    # model_dict = restrict_models(model_dict)
+    model_dict = retrieb_models(model_dict)
     for sw_name, models in model_dict.items():
         print(sw_name)
         for model in models:
@@ -131,7 +138,7 @@ def main():
             ここに実行する実験メソッドを書けば良い
             """
             # vo.adjust_bug_list(model)
-            job = Process(target=exe_DIMA, args=(model))
+            job = Process(target=exe_DIMA, args=(model,))
             jobs.append(job)
             job.start()
             """
