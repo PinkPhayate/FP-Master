@@ -16,3 +16,12 @@ def get_derby_bug_adjust_model():
                       cv='10.9',
                       dn='ApacheDerby')
     return model
+
+def get_bug_process_merge_stub():
+    model = EXP_MODEL(sw='velocity',
+                      fv='1.6',
+                      bvs=None,
+                      pv=None,
+                      cv=None,
+                      dn='ApacheVelocity')
+    return model

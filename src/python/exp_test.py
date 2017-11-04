@@ -5,6 +5,7 @@ SRC_DIR = "/Users/phayate/src"
 METRICS_DIR = "/Users/phayate/Dropbox/STUDY/Metrics"
 DIMA_PATH = METRICS_DIR + "/DIMA-2.4.jar"
 MO_PATH = METRICS_DIR + "/MO-1.1.jar"
+LOG_DIR = METRICS_DIR
 
 def test_export_process_metrics(model):
     arg1 = "{}/{}/{}".format(SRC_DIR, model.dir_name, model.curr_version)
@@ -24,19 +25,9 @@ def test_export_process_metrics(model):
         #  TODO; exxception handler
 
 def test_export_process_bug_report(model):
-    # バグレポート名
-    arg1 = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
-            .format(METRICS_DIR, model.sw_name, model.final_version)
-    # プロセスメトリクスレポート名
-    arg2 = "{0}/{1}/process/ProcessMetrics-{2}.csv"\
-            .format(METRICS_DIR, model.sw_name, model.final_version)
-    # 出力ファイル名
-    arg3 = "{0}/{1}/process-bug/process-bug-{2}.csv"\
-            .format(METRICS_DIR, model.sw_name, model.final_version)
-    query = """python ./tmp/script/bug_process_merger.py {} {} {}"""\
-            .format(arg1, arg2, arg3)
-    res = subprocess.check_output(query, shell=True)
-    print(res)
+    import exp_execution
+    exp_execution.export_process_bug_report(model)
+
 
 def merge_process_product(model):
     arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
@@ -49,7 +40,29 @@ def merge_process_product(model):
     res = subprocess.check_output(query, shell=True)
     print(res)
 
-model = stub.get_derby_model()
+def test_get_exp_versions():
+    from Model import model_creator
+    model_dict = model_creator.get_model_dictionary()
+    print(model_dict)
+
+# model = stub.get_derby_model()
 # test_export_process_metrics(model)
-# test_export_process_bug_report(model)
-merge_process_product(model)
+# merge_process_product(model)
+# test_get_exp_versions()
+
+def config_logger():
+    import logging
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    sh = logging.StreamHandler()
+    sh.setFormatter(formatter)
+
+    debug_logger = logging.getLogger("debug_log")
+    debug_logger.addHandler(sh)
+    debug_logger.setLevel(logging.DEBUG)
+    fh = logging.FileHandler(filename=LOG_DIR+"debug.log")
+    fh.setFormatter(formatter)
+    debug_logger.addHandler(fh)
+
+config_logger()
+model = stub.get_bug_process_merge_stub()
+test_export_process_bug_report(model)
