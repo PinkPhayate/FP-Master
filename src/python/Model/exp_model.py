@@ -5,6 +5,7 @@ class EXP_MODEL(object):
     pre_version = None
     curr_version = None
     dir_name = None
+    alike_metrics = None
 
     def __init__(self, sw, fv, bvs, pv, cv, dn):
         self.sw_name = sw
@@ -13,3 +14,6 @@ class EXP_MODEL(object):
         self.pre_version = pv
         self.curr_version = cv
         self.dir_name = dn
+
+    def set_alike_metrics_list(self, alike_metrics):
+        self.alike_metrics = alike_metrics
