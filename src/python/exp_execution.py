@@ -43,7 +43,7 @@ def exe_DIMA(model):
         report_logger.info(res)
         report_logger.info('execution has done collectly: {}'.format(query))
 
-        query = """mv ProcessMetrics-{}.csv {}/{}/process_test/"""\
+        query = """mv ProcessMetrics-{}.csv {}/{}/process/"""\
                 .format(model.final_version, METRICS_DIR, model.sw_name)
         report_logger.info('execute this query: {}'.format(query))
         subprocess.check_call(query, shell=True)
