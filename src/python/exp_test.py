@@ -28,17 +28,10 @@ def test_export_process_bug_report(model):
     import exp_execution
     exp_execution.export_process_bug_report(model)
 
+def test_merge_process_product(model):
+    import exp_execution
+    exp_execution.merge_process_product(model)
 
-def merge_process_product(model):
-    arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
-    arg2 = "{}/{}/process-bug/process-bug-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
-    arg3 = model.final_version
-    arg4 = "{}/{}/all/".format(METRICS_DIR, model.sw_name)
-    query = """java -jar {} {} {} {} {}"""\
-            .format(MO_PATH, arg1, arg2, arg3, arg4)
-    print(query)
-    res = subprocess.check_output(query, shell=True)
-    print(res)
 
 def test_get_exp_versions():
     from Model import model_creator
@@ -65,4 +58,5 @@ def config_logger():
 
 config_logger()
 model = stub.get_bug_process_merge_stub()
-test_export_process_bug_report(model)
+# test_export_process_bug_report(model)
+test_merge_process_product(model)

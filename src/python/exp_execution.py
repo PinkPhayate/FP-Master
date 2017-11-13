@@ -88,6 +88,22 @@ def export_process_bug_report(model):
     report_logger.info(result_str)
     df.to_csv(arg3)
 
+def merge_process_product(model):
+    """
+    プロダクトメトリクスとプロセスメトリクスをマージするモジュール
+    """
+    MO_PATH = METRICS_DIR + "/MO-1.1.jar"
+    arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
+    arg2 = "{}/{}/process-bug/process-bug-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
+    arg3 = model.final_version
+    # 結果ファイルを格納する
+    arg4 = "{}/{}/all/".format(METRICS_DIR, model.sw_name)
+    query = """java -jar {} {} {} {} {}"""\
+            .format(MO_PATH, arg1, arg2, arg3, arg4)
+    print(query)
+    res = subprocess.check_output(query, shell=True)
+    print(res)
+
 def config_logger():
     import logging
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -131,7 +147,7 @@ def main():
             ここに実行する実験メソッドを書けば良い
             """
             # vo.adjust_bug_list(model)
-            job = Process(target=exe_DIMA, args=(model))
+            job = Process(target=merge_process_product, args=(model,))
             jobs.append(job)
             job.start()
             """
