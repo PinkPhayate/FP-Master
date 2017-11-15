@@ -38,10 +38,16 @@ def test_get_exp_versions():
     model_dict = model_creator.get_model_dictionary()
     print(model_dict)
 
+def test_execute_ex01(model):
+    from ex01_class import Ex01
+    from lib import statistic as st
+    ex01 = Ex01(model, METRICS_DIR)
+    # alike_metrics = st.compare_two_versions(model.final_version, model.prev)
+    ex01.predict()
+
 # model = stub.get_derby_model()
 # test_export_process_metrics(model)
 # merge_process_product(model)
-# test_get_exp_versions()
 
 def config_logger():
     import logging
@@ -57,6 +63,10 @@ def config_logger():
     debug_logger.addHandler(fh)
 
 config_logger()
+# test_get_exp_versions()
+
 model = stub.get_bug_process_merge_stub()
+# print(model.final_version)
 # test_export_process_bug_report(model)
-test_merge_process_product(model)
+# test_merge_process_product(model)
+test_execute_ex01(model)

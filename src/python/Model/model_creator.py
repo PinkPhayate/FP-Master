@@ -31,6 +31,8 @@ def get_model_dictionary():
                               pv=version["diffv"][0],
                               cv=version["diffv"][1],
                               dn=version_data["dirname"])
+            prev = version['prev'] if 'prev' in version.keys() else ''
+            model.set_previous_version(prev)
             models.append(model)
         model_dictionary[version_data["sw"]] = models
     return model_dictionary
