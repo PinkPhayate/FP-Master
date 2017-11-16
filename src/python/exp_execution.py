@@ -88,6 +88,19 @@ def export_process_bug_report(model):
     report_logger.info(result_str)
     df.to_csv(arg3)
 
+def merge_process_product(model):
+    arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
+    arg2 = "{}/{}/process-bug/process-bug-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
+    arg3 = model.final_version
+    arg4 = "{}/{}/all/".format(METRICS_DIR, model.sw_name)
+    query = """java -jar {} {} {} {} {}"""\
+            .format(MO_PATH, arg1, arg2, arg3, arg4)
+    try:
+        res = subprocess.check_output(query, shell=True)
+    except Exception:
+        error_logger.error('could not execute properly query: {}'.format(query))
+    report_logger.info(res)
+
 def config_logger():
     import logging
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -130,7 +143,7 @@ def main():
     config_logger()
     model_dict = model_creator.get_model_dictionary()
     jobs = []
-    model_dict = retrieb_models(model_dict)
+    # model_dict = retrieb_models(model_dict)
     for sw_name, models in model_dict.items():
         print(sw_name)
         for model in models:
@@ -138,7 +151,8 @@ def main():
             ここに実行する実験メソッドを書けば良い
             """
             # vo.adjust_bug_list(model)
-            job = Process(target=exe_DIMA, args=(model,))
+            # job = Process(target=exe_DIMA, args=(model,))
+            job = Process(target=export_process_bug_report, args=(model,))
             jobs.append(job)
             job.start()
             """
