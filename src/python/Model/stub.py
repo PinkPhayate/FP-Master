@@ -24,7 +24,7 @@ def get_bug_process_merge_stub():
                       pv="1.6.4",
                       cv="1.7-beta1",
                       dn='ApacheVelocity')
-    model.prev = "1.6"
+    model.previous_version = "1.6"
     return model
 
 def get_pdt_prs_merge_stub():

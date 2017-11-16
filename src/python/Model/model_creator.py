@@ -16,10 +16,9 @@ def get_exp_versions():
     version_datas = json.loads(version_data)
     return version_datas
 
+
 def get_model_dictionary():
-    '''
-    exp_test.pyにテスト書いた
-    '''
+    """exp_test.pyにテスト書いた"""
     version_datas = get_exp_versions()
     model_dictionary = {}
     for version_data in version_datas:

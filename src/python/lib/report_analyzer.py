@@ -6,7 +6,7 @@ import configparser
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
-REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
+REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/additional_exp/'
 
 
 class Analyzer(object):

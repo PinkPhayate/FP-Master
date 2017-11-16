@@ -90,6 +90,7 @@ def export_process_bug_report(model):
 
 def merge_process_product(model):
     # プロダクトメトリクスとプロセスメトリクスをマージするモジュール
+    report_logger, error_logger = get_logger()
     arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
     arg2 = "{}/{}/process-bug/process-bug-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
     arg3 = model.final_version
@@ -101,6 +102,16 @@ def merge_process_product(model):
     except Exception:
         error_logger.error('could not execute properly query: {}'.format(query))
     report_logger.info(res)
+
+def execute_ex01(model):
+    from ex01_class import Ex01
+    report_logger, error_logger = get_logger()
+    if model.previous_version == '':
+        return
+    report_logger.info('sw name: {}, predict version: {}, previousversion: {}'
+        .format(model.sw_name, model.final_version, model.previous_version))
+    ex01 = Ex01(model, METRICS_DIR)
+    ex01.predict()
 
 def config_logger():
     import logging
@@ -154,7 +165,8 @@ def main():
             # vo.adjust_bug_list(model)
             # job = Process(target=exe_DIMA, args=(model,))
             # job = Process(target=export_process_bug_report, args=(model,))
-            job = Process(target=merge_process_product, args=(model,))
+            # job = Process(target=merge_process_product, args=(model,))
+            job = Process(target=execute_ex01, args=(model,))
             jobs.append(job)
             job.start()
             """

@@ -2,8 +2,9 @@ from lib.repository import PredictorRepository
 from lib import statistic as st
 from lib.report_analyzer import AUCAnalyzer
 from tqdm import tqdm
-from lib.metrics import Metrics_Origin
+from Model.metrics import Metrics
 import configparser
+from logging import getLogger
 import pandas as pd
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
@@ -13,19 +14,32 @@ class Ex01(object):
     METRICS_DIR = None
     TARGET = None
     alike_metrics = None
+    report_logger = None
+    error_logger = None
 
     def __init__(self, model, METRICS_DIR):
         self.model = model
         self.TARGET = model.sw_name
         self.METRICS_DIR = METRICS_DIR
 
+    def __get_logger(self):
+        inifile = configparser.SafeConfigParser()
+        inifile.read('./config.ini')
+        mode = inifile.get('env', 'mode')
+        logger = 'debug' if mode == 'debug' else 'report'
+        self.report_logger, self.error_logger = getLogger(logger+"_log"), getLogger("error_log")
+
 
     def predict(self):
-        ver, predict_ver = self.model.final_version, self.model.prev
+        ver, predict_ver = self.model.final_version, self.model.previous_version
         predictor_rep = PredictorRepository(predict_ver, ver)
-        training_m = Metrics_Origin(ver, self.METRICS_DIR, self.model)
-        evaluate_m = Metrics_Origin(predict_ver, self.METRICS_DIR, self.model)
+        training_m = Metrics(ver, self.METRICS_DIR, self.model)
+        evaluate_m = Metrics(predict_ver, self.METRICS_DIR, self.model)
 
+        if predict_ver is None or self.TARGET is None:
+            self.error_logger('could not create AUCAnalyzer instance.\
+            predict_ver: {}, target: {}'.format(predict_ver, self.TARGET))
+            return
         nml_analyzer = AUCAnalyzer(predict_ver, 'NML', self.TARGET)
         rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN', self.TARGET)
         itg_analyzer = AUCAnalyzer(predict_ver, 'ITG', self.TARGET)
@@ -38,11 +52,13 @@ class Ex01(object):
         # acum_rfn_report= pd.DataFrme([])
         # acum_intel_report= pd.DataFrme([])
 
-        for i in tqdm(range(self.ITER)):
+        # for i in tqdm(range(self.ITER)):
+        for i in range(self.ITER):
             # NML MODEL
             predictor = predictor_rep.get_predictor('NML', self.PRED_TYPE)
-            assert predictor is not None,\
+            if predictor is None:
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
+                return
             # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
             # X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
             X_resampled, y_resampled = training_m.product_df.as_matrix(),\

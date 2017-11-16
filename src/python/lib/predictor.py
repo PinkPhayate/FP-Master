@@ -44,6 +44,7 @@ class Predictor(object):
     def calculate_diagram_saver(self, actual, pred, filename):
         df = pd.concat([ actual, pred ], axis=1)
         df.columns = ['fault', 'ev_value']
+        # print(df['fault'])
         evaluater = auc.AUC(df)
         diagram_value = evaluater. circulate_auc
         # evaluater.save_ev_values( filename=filename )
