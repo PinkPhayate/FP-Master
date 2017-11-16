@@ -28,27 +28,26 @@ def test_export_process_bug_report(model):
     import exp_execution
     exp_execution.export_process_bug_report(model)
 
+def test_merge_process_product(model):
+    import exp_execution
+    exp_execution.merge_process_product(model)
 
-def merge_process_product(model):
-    arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
-    arg2 = "{}/{}/process-bug/process-bug-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
-    arg3 = model.final_version
-    arg4 = "{}/{}/all/".format(METRICS_DIR, model.sw_name)
-    query = """java -jar {} {} {} {} {}"""\
-            .format(MO_PATH, arg1, arg2, arg3, arg4)
-    print(query)
-    res = subprocess.check_output(query, shell=True)
-    print(res)
 
 def test_get_exp_versions():
     from Model import model_creator
     model_dict = model_creator.get_model_dictionary()
     print(model_dict)
 
+def test_execute_ex01(model):
+    from ex01_class import Ex01
+    from lib import statistic as st
+    ex01 = Ex01(model, METRICS_DIR)
+    # alike_metrics = st.compare_two_versions(model.final_version, model.prev)
+    ex01.predict()
+
 # model = stub.get_derby_model()
 # test_export_process_metrics(model)
 # merge_process_product(model)
-# test_get_exp_versions()
 
 def config_logger():
     import logging
@@ -64,5 +63,10 @@ def config_logger():
     debug_logger.addHandler(fh)
 
 config_logger()
+# test_get_exp_versions()
+
 model = stub.get_bug_process_merge_stub()
-test_export_process_bug_report(model)
+# print(model.final_version)
+# test_export_process_bug_report(model)
+# test_merge_process_product(model)
+test_execute_ex01(model)

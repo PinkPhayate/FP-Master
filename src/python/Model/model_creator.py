@@ -9,7 +9,6 @@ METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
 config_file = METRICS_DIR + '/exp_config.json'
 
 def get_exp_versions():
-    print(config_file)
     f = open(config_file, 'r')
     jsonData = json.load(f)
     f.close()
@@ -32,6 +31,8 @@ def get_model_dictionary():
                               pv=version["diffv"][0],
                               cv=version["diffv"][1],
                               dn=version_data["dirname"])
+            prev = version['prev'] if 'prev' in version.keys() else ''
+            model.set_previous_version(prev)
             models.append(model)
         model_dictionary[version_data["sw"]] = models
     return model_dictionary

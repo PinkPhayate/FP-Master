@@ -5,13 +5,14 @@ inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
 
 class Metrics_Origin(object):
-    def __init__(self, version, metrics_dir):
-        self.version = version
+    def __init__(self, version, metrics_dir, model):
+        self.version = model.final_version
         self.metrics_dir = metrics_dir
-        df = pd.read_csv(metrics_dir + '/mergedMetrics'+version+'.csv', header=None)
+        self.model = model
+        __filename = '{}/{}/all/mergedMetrics{}.csv'.format(metrics_dir, model.sw_name, version)
+        df = pd.read_csv(__filename, header=None)
         self.process_df = df.ix[:, 4:7]
         self.process_df.columns = ['pc1','pc2','pc3','pc4']
-
         self.product_df = df.ix[:, 12:17]
         self.product_df.columns = ['pd1','pd2','pd3','pd4','pd5','pd6']
 

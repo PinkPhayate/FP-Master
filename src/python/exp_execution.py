@@ -10,7 +10,7 @@ inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
 METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
-SRC_DIR = "/Users/kishi-lab/Phayate/SW"
+SRC_DIR = "/Users/phayate/src"
 LOG_DIR = METRICS_DIR
 
 def get_logger():
@@ -89,6 +89,7 @@ def export_process_bug_report(model):
     df.to_csv(arg3)
 
 def merge_process_product(model):
+    # プロダクトメトリクスとプロセスメトリクスをマージするモジュール
     arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
     arg2 = "{}/{}/process-bug/process-bug-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
     arg3 = model.final_version
@@ -152,7 +153,8 @@ def main():
             """
             # vo.adjust_bug_list(model)
             # job = Process(target=exe_DIMA, args=(model,))
-            job = Process(target=export_process_bug_report, args=(model,))
+            # job = Process(target=export_process_bug_report, args=(model,))
+            job = Process(target=merge_process_product, args=(model,))
             jobs.append(job)
             job.start()
             """
