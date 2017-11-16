@@ -1,10 +1,13 @@
 from Model import stub
 import subprocess
+import configparser
+inifile = configparser.SafeConfigParser()
+inifile.read('./config.ini')
+ENV = inifile.get('env', 'locale')
+REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
 
 SRC_DIR = "/Users/phayate/src"
-METRICS_DIR = "/Users/phayate/Dropbox/STUDY/Metrics"
-DIMA_PATH = METRICS_DIR + "/DIMA-2.4.jar"
-MO_PATH = METRICS_DIR + "/MO-1.1.jar"
+METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
 LOG_DIR = METRICS_DIR
 
 def test_export_process_metrics(model):

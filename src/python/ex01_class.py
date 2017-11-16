@@ -79,11 +79,11 @@ class Ex01(object):
             predictor = predictor_rep.get_predictor('ITG', self.PRED_TYPE)
             assert predictor is not None,\
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
-            alike_metrics = st.compare_two_versions(training_m)
+            alike_metrics = st.compare_two_versions(training_m, evaluate_m)
             alike_df = training_m.get_specific_df(alike_metrics)
             # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
             # X_resampled, y_resampled = sm.fit_sample(alike_df, training_m.fault)
-            X_resampled, y_resampled = training_m.mrg_df.as_matrix(),\
+            X_resampled, y_resampled = alike_df.as_matrix(),\
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             alike_df = evaluate_m.get_specific_df(alike_metrics)
