@@ -51,6 +51,25 @@ def exe_DIMA(model):
     except:
         report_logger.info('could not executed collectly')
 
+def retrieb_bug_list(model):
+    """
+    ファイナルバージョンに対してバグリストをまとめる（ファイナライズ）するモジュール
+    """
+    import pandas as pd
+    version_list = model.bug_versions
+    bug_list = pd.DataFrame([])
+    for version in version_list:
+        # バグレポート名
+        arg1 = "{0}/{1}/bug/{1}_{2}_bgmd.csv"\
+            .format(METRICS_DIR, model.sw_name, version)
+        print(arg1)
+        df = pd.read_csv(arg1, header=None)
+        bug_list = pd.concat([bug_list, df], axis=0)
+    arg1 = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    bug_list.to_csv(arg1, index=False, header=None)
+    # print(bug_list)
+
 def export_process_bug_report(model):
     '''
     solution1(sw名より以下のモジュール名を取得)の場合、
@@ -90,6 +109,7 @@ def export_process_bug_report(model):
 
 def merge_process_product(model):
     # プロダクトメトリクスとプロセスメトリクスをマージするモジュール
+    report_logger, error_logger = get_logger()
     arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
     arg2 = "{}/{}/process-bug/process-bug-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
     arg3 = model.final_version
@@ -101,6 +121,18 @@ def merge_process_product(model):
     except Exception:
         error_logger.error('could not execute properly query: {}'.format(query))
     report_logger.info(res)
+
+def execute_ex01(model):
+    from ex01_class import Ex01
+    report_logger, error_logger = get_logger()
+    if model.previous_version == '':
+        return
+    report_logger.info('sw name: {}, predict version: {}, previousversion: {}'
+        .format(model.sw_name, model.final_version, model.previous_version))
+    ex01 = Ex01(model, METRICS_DIR)
+    ex01.predict()
+=======
+>>>>>>> 8a7eeb864e4d2d5cd8871c7ffb6a13d3cffeba26
 
 def config_logger():
     import logging
@@ -146,18 +178,19 @@ def main():
     jobs = []
     # model_dict = retrieb_models(model_dict)
     for sw_name, models in model_dict.items():
-        print(sw_name)
         for model in models:
             """
             ここに実行する実験メソッドを書けば良い
             """
             # vo.adjust_bug_list(model)
-<<<<<<< HEAD
             # job = Process(target=exe_DIMA, args=(model,))
-            job = Process(target=export_process_bug_report, args=(model,))
-=======
+            # job = Process(target=export_process_bug_report, args=(model,))
+            # job = Process(target=merge_process_product, args=(model,))
+            # job = Process(target=execute_ex01, args=(model,))
+            # job = Process(target=retrieb_bug_list, args=(model,))
+            # job = Process(target=exe_DIMA, args=(model,))
+            # job = Process(target=export_process_bug_report, args=(model,))
             job = Process(target=merge_process_product, args=(model,))
->>>>>>> 6383f1153061099ee0f1abde28ff93fa171a718e
             jobs.append(job)
             job.start()
             """
