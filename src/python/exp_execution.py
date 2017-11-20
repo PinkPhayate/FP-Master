@@ -51,11 +51,12 @@ def exe_DIMA(model):
     except:
         report_logger.info('could not executed collectly')
 
-def retrieb_bug_list(model):
+def export_process_bug_report(model):
     """
     ファイナルバージョンに対してバグリストをまとめる（ファイナライズ）するモジュール
     """
     import pandas as pd
+    report_logger, error_logger = get_logger()
     version_list = model.bug_versions
     bug_list = pd.DataFrame([])
     for version in version_list:
@@ -63,17 +64,22 @@ def retrieb_bug_list(model):
         arg1 = "{0}/{1}/bug/{1}_{2}_bgmd.csv"\
             .format(METRICS_DIR, model.sw_name, version)
         print(arg1)
-        df = pd.read_csv(arg1, header=None)
+        try:
+            df = pd.read_csv(arg1, header=None)
+        except:
+            error_logger.error('this file couldnt find: {}'.format(arg1))
+            return
         bug_list = pd.concat([bug_list, df], axis=0)
     arg1 = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
         .format(METRICS_DIR, model.sw_name, model.final_version)
     bug_list.to_csv(arg1, index=False, header=None)
     # print(bug_list)
 
-def export_process_bug_report(model):
+def merge_process_bug(model):
     '''
-    solution1(sw名より以下のモジュール名を取得)の場合、
-    いくつのバグレポートがマージされずに終わるか
+    プロセスメトリクスとバグレポートをマージする
+    sol1: 全体的にうまくいく？
+    sol2: derbyとvelocityがうまく行かない
     '''
     import pandas as pd
     import version_operator as vo
@@ -89,6 +95,7 @@ def export_process_bug_report(model):
         .format(METRICS_DIR, model.sw_name, model.final_version)
     # バグモジュールの書かれたリストを取得
     bug_list, exc_bug_list = vo.get_bug_list_sol1(arg1, model.sw_name)
+    # bug_list, exc_bug_list = vo.get_bug_list_sol2(arg1, model.sw_name)
     error_str = '{} {}, excepted bug modules: {}'\
         .format(model.sw_name, model.final_version, exc_bug_list)
     if 0 < len(exc_bug_list):
@@ -98,17 +105,21 @@ def export_process_bug_report(model):
     df['fileName'] = df.apply(lambda x: x['fileName'].split("/")[9:], axis=1)
     df['fileName'] = df.apply(lambda x: "/".join(x['fileName']), axis=1)
     df['fileName'] = df.apply(lambda x: vo.transform_sol1(x['fileName'], model.sw_name), axis=1)
+    # df['fileName'] = df.apply(lambda x: vo.transform_sol2(x['fileName'], model.sw_name), axis=1)
+    # df['fileName'] = df.apply(lambda x: x['fileName'].split("/")[-1], axis=1)
     df['bug'] = df.apply(lambda x: 1 if(x['fileName'] in bug_list) else 0, axis=1)
     # bug number is integer
     # df['bug'] = df.apply(lambda x: bug_list.count(x['fileName']), axis=1)
     found = df['bug'].sum()
     result_str = '{} {}, bef/after {}/{}'\
         .format(model.sw_name, model.final_version, len(bug_list), found)
+    print(result_str)
     report_logger.info(result_str)
     df.to_csv(arg3)
 
 def merge_process_product(model):
     # プロダクトメトリクスとプロセスメトリクスをマージするモジュール
+    MO_PATH = METRICS_DIR + "/MO-1.1.jar"
     report_logger, error_logger = get_logger()
     arg1 = "{}/{}/product/product-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
     arg2 = "{}/{}/process-bug/process-bug-{}.csv".format(METRICS_DIR, model.sw_name, model.final_version)
@@ -131,8 +142,6 @@ def execute_ex01(model):
         .format(model.sw_name, model.final_version, model.previous_version))
     ex01 = Ex01(model, METRICS_DIR)
     ex01.predict()
-=======
->>>>>>> 8a7eeb864e4d2d5cd8871c7ffb6a13d3cffeba26
 
 def config_logger():
     import logging
@@ -143,14 +152,14 @@ def config_logger():
     error_logger = logging.getLogger("error_log")
     error_logger.addHandler(sh)
     error_logger.setLevel(logging.ERROR)
-    fh = logging.FileHandler(filename=LOG_DIR+"error.log")
+    fh = logging.FileHandler(filename=LOG_DIR+"/error.log")
     fh.setFormatter(formatter)
     error_logger.addHandler(fh)
 
     report_logger = logging.getLogger("report_log")
     report_logger.addHandler(sh)
     report_logger.setLevel(logging.INFO)
-    fh = logging.FileHandler(filename=LOG_DIR+"report.log")
+    fh = logging.FileHandler(filename=LOG_DIR+"/report.log")
     fh.setFormatter(formatter)
     report_logger.addHandler(fh)
 
@@ -184,13 +193,13 @@ def main():
             """
             # vo.adjust_bug_list(model)
             # job = Process(target=exe_DIMA, args=(model,))
-            # job = Process(target=export_process_bug_report, args=(model,))
-            # job = Process(target=merge_process_product, args=(model,))
+            # job = Process(target=merge_process_bug, args=(model,))
+            job = Process(target=merge_process_product, args=(model,))
             # job = Process(target=execute_ex01, args=(model,))
             # job = Process(target=retrieb_bug_list, args=(model,))
             # job = Process(target=exe_DIMA, args=(model,))
+            # job = Process(target=merge_process_product, args=(model,))
             # job = Process(target=export_process_bug_report, args=(model,))
-            job = Process(target=merge_process_product, args=(model,))
             jobs.append(job)
             job.start()
             """

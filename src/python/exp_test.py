@@ -27,14 +27,13 @@ def test_export_process_metrics(model):
         print("exception handler")
         #  TODO; exxception handler
 
-def test_export_process_bug_report(model):
+def test_merge_process_bug(model):
     import exp_execution
-    exp_execution.export_process_bug_report(model)
+    exp_execution.merge_process_bug(model)
 
 def test_merge_process_product(model):
     import exp_execution
     exp_execution.merge_process_product(model)
-
 
 def test_get_exp_versions():
     from Model import model_creator
@@ -50,10 +49,11 @@ def test_execute_ex01(model):
 
 def test_get_bug_list_sol1(model):
     import version_operator as vo
-    arg1 = "{0}/{1}/bug/{1}_{2}_bgmd.csv"\
+    arg1 = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
         .format(METRICS_DIR, model.sw_name, model.final_version)
-    bug_list, exc_bug_list = vo.get_bug_list_sol1(arg1, model.sw_name)
+    bug_list, exc_bug_list = vo.get_bug_list_sol2(arg1, model.sw_name)
     print(len(bug_list))
+    print(exc_bug_list)
 
 def test_retrieb_bug_list(model):
     import exp_execution
@@ -86,4 +86,6 @@ model = stub.get_derby_bug_adjust_model()
 # test_execute_ex01(model)
 # test_get_bug_list_sol1(model)
 # test_export_process_bug_report(model)
-test_retrieb_bug_list(model)
+# test_retrieb_bug_list(model)
+# test_get_bug_list_sol1(model)
+test_merge_process_bug(model)
