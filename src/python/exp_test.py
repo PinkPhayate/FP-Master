@@ -48,6 +48,16 @@ def test_execute_ex01(model):
     # alike_metrics = st.compare_two_versions(model.final_version, model.prev)
     ex01.predict()
 
+def test_get_bug_list_sol1(model):
+    import version_operator as vo
+    arg1 = "{0}/{1}/bug/{1}_{2}_bgmd.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    bug_list, exc_bug_list = vo.get_bug_list_sol1(arg1, model.sw_name)
+    print(len(bug_list))
+
+def test_retrieb_bug_list(model):
+    import exp_execution
+    exp_execution.retrieb_bug_list(model)
 # model = stub.get_derby_model()
 # test_export_process_metrics(model)
 # merge_process_product(model)
@@ -68,8 +78,12 @@ def config_logger():
 config_logger()
 # test_get_exp_versions()
 
-model = stub.get_bug_process_merge_stub()
+# model = stub.get_bug_process_merge_stub()
+model = stub.get_derby_bug_adjust_model()
 # print(model.final_version)
 # test_export_process_bug_report(model)
 # test_merge_process_product(model)
-test_execute_ex01(model)
+# test_execute_ex01(model)
+# test_get_bug_list_sol1(model)
+# test_export_process_bug_report(model)
+test_retrieb_bug_list(model)

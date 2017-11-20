@@ -8,7 +8,7 @@ from logging import getLogger
 import pandas as pd
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
-    ITER = 3
+    ITER = 200
     PRED_TYPE = 'rf'
     model = None
     METRICS_DIR = None

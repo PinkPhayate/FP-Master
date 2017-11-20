@@ -51,6 +51,25 @@ def exe_DIMA(model):
     except:
         report_logger.info('could not executed collectly')
 
+def retrieb_bug_list(model):
+    """
+    ファイナルバージョンに対してバグリストをまとめる（ファイナライズ）するモジュール
+    """
+    import pandas as pd
+    version_list = model.bug_versions
+    bug_list = pd.DataFrame([])
+    for version in version_list:
+        # バグレポート名
+        arg1 = "{0}/{1}/bug/{1}_{2}_bgmd.csv"\
+            .format(METRICS_DIR, model.sw_name, version)
+        print(arg1)
+        df = pd.read_csv(arg1, header=None)
+        bug_list = pd.concat([bug_list, df], axis=0)
+    arg1 = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    bug_list.to_csv(arg1, index=False, header=None)
+    # print(bug_list)
+
 def export_process_bug_report(model):
     '''
     solution1(sw名より以下のモジュール名を取得)の場合、
@@ -157,7 +176,6 @@ def main():
     jobs = []
     # model_dict = retrieb_models(model_dict)
     for sw_name, models in model_dict.items():
-        print(sw_name)
         for model in models:
             """
             ここに実行する実験メソッドを書けば良い
@@ -166,7 +184,8 @@ def main():
             # job = Process(target=exe_DIMA, args=(model,))
             # job = Process(target=export_process_bug_report, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
-            job = Process(target=execute_ex01, args=(model,))
+            # job = Process(target=execute_ex01, args=(model,))
+            job = Process(target=retrieb_bug_list, args=(model,))
             jobs.append(job)
             job.start()
             """
