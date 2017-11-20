@@ -131,6 +131,8 @@ def execute_ex01(model):
         .format(model.sw_name, model.final_version, model.previous_version))
     ex01 = Ex01(model, METRICS_DIR)
     ex01.predict()
+=======
+>>>>>>> 8a7eeb864e4d2d5cd8871c7ffb6a13d3cffeba26
 
 def config_logger():
     import logging
@@ -185,7 +187,10 @@ def main():
             # job = Process(target=export_process_bug_report, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
             # job = Process(target=execute_ex01, args=(model,))
-            job = Process(target=retrieb_bug_list, args=(model,))
+            # job = Process(target=retrieb_bug_list, args=(model,))
+            # job = Process(target=exe_DIMA, args=(model,))
+            # job = Process(target=export_process_bug_report, args=(model,))
+            job = Process(target=merge_process_product, args=(model,))
             jobs.append(job)
             job.start()
             """
