@@ -31,6 +31,10 @@ def test_merge_process_bug(model):
     import exp_execution
     exp_execution.merge_process_bug(model)
 
+def test_merge_process_bug_derby(model):
+    import exp_execution
+    exp_execution.merge_process_bug_derby(model)
+
 def test_merge_process_product(model):
     import exp_execution
     exp_execution.merge_process_product(model)
@@ -79,7 +83,8 @@ config_logger()
 # test_get_exp_versions()
 
 # model = stub.get_bug_process_merge_stub()
-model = stub.get_derby_bug_adjust_model()
+# model = stub.get_derby_bug_adjust_model()
+model = stub.get_derby_model()
 # print(model.final_version)
 # test_export_process_bug_report(model)
 # test_merge_process_product(model)
@@ -88,4 +93,5 @@ model = stub.get_derby_bug_adjust_model()
 # test_export_process_bug_report(model)
 # test_retrieb_bug_list(model)
 # test_get_bug_list_sol1(model)
-test_merge_process_bug(model)
+# test_merge_process_bug(model)
+test_merge_process_bug_derby(model)

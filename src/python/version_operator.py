@@ -60,12 +60,10 @@ def transform_sol1(bug_module, sw_name):
     soluted_bug_module = bug_module.split(beginning_str)[-1]
     return soluted_bug_module
 
-def transform_sol2(bug_module, sw_name):
-    beginning_str = "java/"
+def transform_sol3(bug_module, sw_name):
+    beginning_str = "/"
     li = bug_module.split(beginning_str)
-    if 1 < len(li):
-        return li[-1]
-    # print(li)
+    return li[-1]
 
 def get_bug_list_sol1(bug_filename, sw_name):
     '''
@@ -104,6 +102,23 @@ def get_bug_list_sol2(bug_filename, sw_name):
             exc_bug_list.append(bug_module)
     report_logger.info('reduction of numbug module via soli2 {}/{}'.format(len(bug_list), len(soluted_bug_list)))
     return soluted_bug_list, exc_bug_list
+
+def get_bug_list_sol3(bug_filename, sw_name):
+    '''
+    sol3でバグリストを整形する
+    sol3: そのファイル名のみ
+    '''
+    report_logger, error_logger = get_logger()
+    bug_list = get_bug_list(bug_filename)
+    beginning_str = "java/"
+    soluted_bug_list = []
+    exc_bug_list = []
+    soluted_bug_list = [x.split('/')[-1] for x in bug_list]
+    # print(soluted_bug_list)
+    # raise Exception
+    # soluted_bug_list = map(lambda x: x.split('/')[-1], bug_list)
+    report_logger.info('reduction of numbug module via soli2 {}/{}'.format(len(bug_list), len(soluted_bug_list)))
+    return soluted_bug_list, None
 
 def adjust_bug_list(model):
     '''

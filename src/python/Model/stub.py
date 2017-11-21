@@ -1,11 +1,12 @@
 from Model.exp_model import EXP_MODEL
 def get_derby_model():
     model = EXP_MODEL(sw='derby',
-                      fv='10.9',
-                      bvs=['10.8'],
-                      pv='10.8',
-                      cv='10.9',
+                      fv='10.13.1.1',
+                      bvs=['10.14.1.0'],
+                      pv='10.12.1.1',
+                      cv='10.13.1.1',
                       dn='ApacheDerby')
+    model.previous_version = "10.12.1.1"
     return model
 
 def get_derby_bug_adjust_model():

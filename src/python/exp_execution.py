@@ -117,6 +117,40 @@ def merge_process_bug(model):
     report_logger.info(result_str)
     df.to_csv(arg3)
 
+def merge_process_bug_derby(model):
+    '''
+    プロセスメトリクスとバグレポートをマージする
+    sol1: 全体的にうまくいく？
+    sol2: derbyとvelocityがうまく行かない
+    '''
+    import pandas as pd
+    import version_operator as vo
+    report_logger, error_logger = get_logger()
+    # バグレポート名
+    arg1 = "{0}/{1}/bug/ad_{1}_{2}_bgmd.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    # プロセスメトリクスレポート名
+    arg2 = "{0}/{1}/process/ProcessMetrics-{2}.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    # 出力ファイル名
+    arg3 = "{0}/{1}/process-bug/process-bug-{2}.csv"\
+        .format(METRICS_DIR, model.sw_name, model.final_version)
+    # バグモジュールの書かれたリストを取得
+    bug_list, exc_bug_list = vo.get_bug_list_sol3(arg1, model.sw_name)
+    # プロセスメトリクスのcsvを読み込み
+    df = pd.read_csv(arg2, header=0)
+    df['fileName'] = df.apply(lambda x: x['fileName'].split("/")[7:], axis=1)
+    df['fileName'] = df.apply(lambda x: "/".join(x['fileName']), axis=1)
+    df['fileName'] = df.apply(lambda x: vo.transform_sol3(x['fileName'], model.sw_name), axis=1)
+    df['bug'] = df.apply(lambda x: 1 if(x['fileName'] in bug_list) else 0, axis=1)
+    # bug number is integer
+    # df['bug'] = df.apply(lambda x: bug_list.count(x['fileName']), axis=1)
+    found = df['bug'].sum()
+    result_str = '{} {}, bef/after {}/{}'\
+        .format(model.sw_name, model.final_version, len(bug_list), found)
+    report_logger.info(result_str)
+    df.to_csv(arg3)
+
 def merge_process_product(model):
     # プロダクトメトリクスとプロセスメトリクスをマージするモジュール
     MO_PATH = METRICS_DIR + "/MO-1.1.jar"
@@ -172,7 +206,7 @@ def restrict_models(model_dict):
     return model_dict_copy
 
 def retrieb_models(model_dict):
-    target_array = ['poi']
+    target_array = ['derby']
     model_dict_copy = {}
     for version in model_dict.keys():
         if version in target_array:
@@ -185,7 +219,7 @@ def main():
     config_logger()
     model_dict = model_creator.get_model_dictionary()
     jobs = []
-    # model_dict = retrieb_models(model_dict)
+    model_dict = retrieb_models(model_dict)
     for sw_name, models in model_dict.items():
         for model in models:
             """
@@ -193,13 +227,11 @@ def main():
             """
             # vo.adjust_bug_list(model)
             # job = Process(target=exe_DIMA, args=(model,))
-            # job = Process(target=merge_process_bug, args=(model,))
-            job = Process(target=merge_process_product, args=(model,))
-            # job = Process(target=execute_ex01, args=(model,))
             # job = Process(target=retrieb_bug_list, args=(model,))
-            # job = Process(target=exe_DIMA, args=(model,))
+            # job = Process(target=merge_process_bug, args=(model,))
+            # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
-            # job = Process(target=export_process_bug_report, args=(model,))
+            job = Process(target=execute_ex01, args=(model,))
             jobs.append(job)
             job.start()
             """
