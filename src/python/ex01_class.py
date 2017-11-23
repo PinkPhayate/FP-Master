@@ -8,7 +8,7 @@ from logging import getLogger
 import pandas as pd
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
-    ITER = 200
+    ITER = 50
     PRED_TYPE = 'rf'
     model = None
     METRICS_DIR = None
@@ -31,10 +31,15 @@ class Ex01(object):
 
 
     def predict(self):
-        ver, predict_ver = self.model.final_version, self.model.previous_version
+        self.__get_logger()
+        ver, predict_ver = self.model.previous_version, self.model.final_version
         predictor_rep = PredictorRepository(predict_ver, ver)
         training_m = Metrics(ver, self.METRICS_DIR, self.model)
         evaluate_m = Metrics(predict_ver, self.METRICS_DIR, self.model)
+        self.alike_metrics = st.compare_two_versions(training_m, evaluate_m)
+        msg = "Sw: {}, version: {}, alike_metrics: {}"\
+            .format(self.model.sw_name, predict_ver, self.alike_metrics)
+        self.report_logger.info(msg)
 
         if predict_ver is None or self.TARGET is None:
             self.error_logger('could not create AUCAnalyzer instance.\
@@ -95,14 +100,13 @@ class Ex01(object):
             predictor = predictor_rep.get_predictor('ITG', self.PRED_TYPE)
             assert predictor is not None,\
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
-            alike_metrics = st.compare_two_versions(training_m, evaluate_m)
-            alike_df = training_m.get_specific_df(alike_metrics)
+            alike_df = training_m.get_specific_df(self.alike_metrics)
             # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
             # X_resampled, y_resampled = sm.fit_sample(alike_df, training_m.fault)
             X_resampled, y_resampled = alike_df.as_matrix(),\
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
-            alike_df = evaluate_m.get_specific_df(alike_metrics)
+            alike_df = evaluate_m.get_specific_df(self.alike_metrics)
             rfn_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv")
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
