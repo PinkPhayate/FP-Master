@@ -289,25 +289,25 @@ class AUCAnalyzer(Analyzer):
     def calculate_2(self):
         __df = self.report_df[self.report_df.apply(
             lambda x: x['isModified'] == 0, axis=1)]
-        recall, accuracy, precision = self.calculate_2indict(__df)
+        recall, precision, f1 = self.calculate_2indict(__df)
         self.accum_recall2.append(recall)
-        self.accum_accuracy2.append(accuracy)
+        self.accum_accuracy2.append(f1)
         self.accum_precision2.append(precision)
 
     def calculate_3(self):
         __df = self.report_df[self.report_df.apply(
             lambda x: x['isModified'] == 1, axis=1)]
-        recall, accuracy, precision = self.calculate_2indict(__df)
+        recall, precision, f1 = self.calculate_2indict(__df)
         self.accum_recall3.append(recall)
-        self.accum_accuracy3.append(accuracy)
+        self.accum_accuracy3.append(f1)
         self.accum_precision3.append(precision)
 
     def calculate_4(self):
         __df = self.report_df[self.report_df.apply(
             lambda x: x['isNew'] == 1, axis=1)]
-        recall, accuracy, precision = self.calculate_2indict(__df)
+        recall, precision, f1 = self.calculate_2indict(__df)
         self.accum_recall4.append(recall)
-        self.accum_accuracy4.append(accuracy)
+        self.accum_accuracy4.append(f1)
         self.accum_precision4.append(precision)
 
     def count_fp_num(self, df):
