@@ -1,6 +1,9 @@
 from lib.repository import PredictorRepository
+from imblearn.over_sampling import RandomOverSampler
+import random
 from lib import statistic as st
 from lib.report_analyzer import AUCAnalyzer
+from lib.report_analyzer import Analyzer
 from tqdm import tqdm
 from Model.metrics import Metrics
 import configparser
@@ -64,10 +67,10 @@ class Ex01(object):
             if predictor is None:
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
                 return
-            # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-            # X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
-            X_resampled, y_resampled = training_m.product_df.as_matrix(),\
-                training_m.fault.as_matrix()
+            sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+            X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
+            # X_resampled, y_resampled = training_m.product_df.as_matrix(),\
+            #     training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             nml_value, importance = predictor.predict_test_data(model, evaluate_m.product_df, evaluate_m.fault, self.TARGET + "-ex1nml.csv")
             predictor.set_is_new_df(evaluate_m.isNew)
@@ -82,10 +85,10 @@ class Ex01(object):
             predictor = predictor_rep.get_predictor('RFN', self.PRED_TYPE)
             assert predictor is not None,\
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
-            # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-            # X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
-            X_resampled, y_resampled = training_m.mrg_df.as_matrix(),\
-                training_m.fault.as_matrix()
+            sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+            X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
+            # X_resampled, y_resampled = training_m.mrg_df.as_matrix(),\
+            #     training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, self.TARGET + "-ex1rfn.csv")
             predictor.set_is_new_df(evaluate_m.isNew)
@@ -101,10 +104,10 @@ class Ex01(object):
             assert predictor is not None,\
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
             alike_df = training_m.get_specific_df(self.alike_metrics)
-            # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-            # X_resampled, y_resampled = sm.fit_sample(alike_df, training_m.fault)
-            X_resampled, y_resampled = alike_df.as_matrix(),\
-                training_m.fault.as_matrix()
+            sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+            X_resampled, y_resampled = sm.fit_sample(alike_df, training_m.fault)
+            # X_resampled, y_resampled = alike_df.as_matrix(),\
+            #     training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             alike_df = evaluate_m.get_specific_df(self.alike_metrics)
             rfn_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv")
