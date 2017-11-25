@@ -177,6 +177,16 @@ def execute_ex01(model):
     ex01 = Ex01(model, METRICS_DIR)
     ex01.predict()
 
+def execute_ex01_prob(model):
+    from ex01_class import Ex01
+    report_logger, error_logger = get_logger()
+    if model.previous_version == '':
+        return
+    report_logger.info('sw name: {}, predict version: {}, previousversion: {}'
+        .format(model.sw_name, model.final_version, model.previous_version))
+    ex01 = Ex01(model, METRICS_DIR)
+    ex01.predict_prob()
+
 def config_logger():
     import logging
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')

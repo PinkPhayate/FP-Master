@@ -35,3 +35,15 @@ def get_model_dictionary():
             models.append(model)
         model_dictionary[version_data["sw"]] = models
     return model_dictionary
+
+def retrieve_model(sw_name, version):
+    model_dict = get_model_dictionary()
+    for sw, models in model_dict.items():
+        for model in models:
+            if model.final_version == version and\
+               sw_name == sw:
+               return model
+    else:
+        print('could not find model sw_name: {},version: {}'\
+              .format(sw_name, version))
+        raise Exception
