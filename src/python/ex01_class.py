@@ -121,6 +121,20 @@ class Ex01(object):
                 itg_analyzer.calculate()
                 itg_analyzer.analyze_predict_result()
 
+        # conducy mann whitneyu test
+        pvalue = st.conduct_m_whitney_test(rfn_analyzer.accum_precision0, itg_analyzer.accum_precision0)
+        msg = 'sw: {}, version: {}, p-value 0 of mann whitney u test: {}'.format(self.model.sw_name, self.model.final_version, pvalue)
+        self.report_logger.info(msg)
+        print(msg)
+        pvalue = st.conduct_m_whitney_test(rfn_analyzer.accum_precision2, itg_analyzer.accum_precision2)
+        msg = 'sw: {}, version: {}, p-value 2 of mann whitney u test: {}'.format(self.model.sw_name, self.model.final_version, pvalue)
+        self.report_logger.info(msg)
+        print(msg)
+        pvalue = st.conduct_m_whitney_test(rfn_analyzer.accum_precision3, itg_analyzer.accum_precision3)
+        msg = 'sw: {}, version: {}, p-value 3 of mann whitney u test: {}'.format(self.model.sw_name, self.model.final_version, pvalue)
+        self.report_logger.info(msg)
+        print(msg)
+
         # export report
         nml_df = nml_analyzer.calculate_average(self.ITER)
         rfn_df = rfn_analyzer.calculate_average(self.ITER)

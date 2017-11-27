@@ -56,3 +56,8 @@ def compare_two_versions(version1, version2):
         if (THRESOLD < pvalue):
             alike_metrics.append(m)
     return alike_metrics
+
+def conduct_m_whitney_test(result1, result2):
+    from scipy import stats
+    result = stats.mannwhitneyu(result1, result2)
+    return result.pvalue
