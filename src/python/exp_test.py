@@ -69,6 +69,11 @@ def test_get_bug_list_sol1(model):
 def test_retrieb_bug_list(model):
     import exp_execution
     exp_execution.retrieb_bug_list(model)
+
+def test_draw_metrics_distribution(model):
+    import exp_execution
+    exp_execution.draw_metrics_distribution(model)
+
 # model = stub.get_derby_model()
 # test_export_process_metrics(model)
 # merge_process_product(model)
@@ -91,8 +96,8 @@ config_logger()
 
 # model = stub.get_bug_process_merge_stub()
 # model = stub.get_derby_bug_adjust_model()
-model = stub.get_derby_model()
-# model = stub.get_hive_model()
+# model = stub.get_derby_model()
+model = stub.get_hive_model()
 # print(model.final_version)
 # test_export_process_bug_report(model)
 # test_merge_process_product(model)
@@ -102,5 +107,6 @@ model = stub.get_derby_model()
 # test_get_bug_list_sol1(model)
 # test_merge_process_bug(model)
 # test_merge_process_bug_derby(model)
-test_execute_ex01(model)
+# test_execute_ex01(model)
 # test_execute_ex01_prob(model)
+test_draw_metrics_distribution(model)

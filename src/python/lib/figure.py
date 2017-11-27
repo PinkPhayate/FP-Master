@@ -1,6 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
+import seaborn as sns
 args = sys.argv
 def get_graph_data(filename):
     df = pd.read_csv(filename, header=0)
@@ -140,6 +141,10 @@ def _draw_ks_linear_glaph(filename):
 
     plt.savefig(filename)
 
+def draw_violin_plot(data1, data2, fileName):
+    sns.violinplot(data =[data1,data2])
+    sns.despine(offset=10, trim=True)
+    plt.savefig(fileName)
 
 if __name__ == '__main__':
     # mode = 2 if args[1]=="2" else  3

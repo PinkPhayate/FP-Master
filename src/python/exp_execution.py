@@ -187,6 +187,19 @@ def execute_ex01_prob(model):
     ex01 = Ex01(model, METRICS_DIR)
     ex01.predict_prob()
 
+def draw_metrics_distribution(model):
+    from Model.metrics import Metrics
+    from Model import model_creator as mc
+    from lib import figure
+    metrics = Metrics(model.final_version, METRICS_DIR, model)
+    pre_model = mc.retrieve_model(model.sw_name, model.final_version)
+    pre_metrics = Metrics(model.previous_version, METRICS_DIR, pre_model)
+    for column in metrics.mrg_df.columns:
+        fileName = '{}/{}-{}-{}.png'.format(METRICS_DIR, model.sw_name, model.final_version, column)
+        figure.draw_violin_plot(metrics.mrg_df.ix[:, column],
+                                pre_metrics.mrg_df.ix[:, column],
+                                fileName=fileName)
+
 def config_logger():
     import logging
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -216,7 +229,7 @@ def restrict_models(model_dict):
     return model_dict_copy
 
 def retrieb_models(model_dict):
-    target_array = ['poi']
+    target_array = ['log4j', 'velocity']
     model_dict_copy = {}
     for version in model_dict.keys():
         if version in target_array:
