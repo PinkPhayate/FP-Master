@@ -130,13 +130,13 @@ class RFPredictor(Predictor):
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
         model = RandomForestClassifier(
-            oob_score=True,
-            class_weight='balanced',
-            max_features="auto",
-            max_depth=3,
-            n_estimators=100,
-            min_samples_split=5,
-            min_samples_leaf=3
+            oob_score=False,
+            class_weight=None,
+            # max_features="auto",
+            max_depth=9,
+            n_estimators=50,
+            min_samples_split=3,
+            # min_samples_leaf=3
         )
         model.fit(ev_data, column_or_1d(dv_data))
 
