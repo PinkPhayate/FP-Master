@@ -48,6 +48,7 @@ def test_execute_ex01(model):
     from ex01_class import Ex01
     from lib import statistic as st
     ex01 = Ex01(model, METRICS_DIR)
+    ex01.ITER = 5
     # alike_metrics = st.compare_two_versions(model.final_version, model.prev)
     ex01.predict()
 
@@ -107,7 +108,7 @@ model = stub.get_hive_model()
 # test_get_bug_list_sol1(model)
 # test_merge_process_bug(model)
 # test_merge_process_bug_derby(model)
-# test_execute_ex01(model)
+test_execute_ex01(model)
 # test_execute_ex01_prob(model)
-test_draw_metrics_distribution(model)
+# test_draw_metrics_distribution(model)
 # test_draw_metrics_distribution(model, )

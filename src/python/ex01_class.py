@@ -10,6 +10,10 @@ from Model import model_creator as mc
 import configparser
 from logging import getLogger
 import pandas as pd
+inifile = configparser.SafeConfigParser()
+inifile.read('./config.ini')
+ENV = inifile.get('env', 'locale')
+
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
     ITER = 50
@@ -34,6 +38,36 @@ class Ex01(object):
         self.report_logger, self.error_logger = getLogger(logger+"_log"), getLogger("error_log")
 
 
+    def __draw_result_boxplot(self, analyzer_a, analyzer_b, index=0):
+        from lib import figure
+        try:
+            version_a = analyzer_a.predict_version
+            version_b = analyzer_b.predict_version
+            assert version_a == version_b
+        except:
+            self.error_logger.error('predict version was different: {}:{}'.format(version_a, version_b)); return
+
+        REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/figure/'
+        figure_name = '{}/result_wisky-{}^{}{}.png'.format(REPORT_DIR, version_a, self.PRED_TYPE, index)
+
+        if index ==0:
+            g1 = pd.DataFrame([analyzer_a.accum_accuracy0]).T
+            g2 = pd.DataFrame([analyzer_b.accum_accuracy0]).T
+        elif index == 2:
+            g1 = pd.DataFrame([analyzer_a.accum_accuracy2]).T
+            g2 = pd.DataFrame([analyzer_b.accum_accuracy2]).T
+        elif index == 3:
+            g1 = pd.DataFrame([analyzer_a.accum_accuracy3]).T
+            g2 = pd.DataFrame([analyzer_b.accum_accuracy3]).T
+        else:
+            print('designated incollect index: {}'.format(index))
+            return
+
+        g1.columns = [['ORG']]
+        g2.columns = [['DST']]
+        hige = pd.concat([g1, g2], axis=1)
+        figure.create_boxplot_seaborn(hige, figure_name)
+
     def predict(self):
         self.__get_logger()
         ver, predict_ver = self.model.previous_version, self.model.final_version
@@ -47,7 +81,7 @@ class Ex01(object):
         self.report_logger.info(msg)
 
         if predict_ver is None or self.TARGET is None:
-            self.error_logger('could not create AUCAnalyzer instance.\
+            self.error_logger.error('could not create AUCAnalyzer instance.\
             predict_ver: {}, target: {}'.format(predict_ver, self.TARGET))
             return
         nml_analyzer = AUCAnalyzer(predict_ver, 'NML', self.TARGET)
@@ -135,6 +169,10 @@ class Ex01(object):
         self.report_logger.info(msg)
         print(msg)
 
+        # draw voxplot graph
+        self.__draw_result_boxplot(rfn_analyzer, itg_analyzer)
+
+
         # export report
         nml_df = nml_analyzer.calculate_average(self.ITER)
         rfn_df = rfn_analyzer.calculate_average(self.ITER)
@@ -164,7 +202,7 @@ class Ex01(object):
         self.report_logger.info(msg)
 
         if predict_ver is None or self.TARGET is None:
-            self.error_logger('could not create AUCAnalyzer instance.\
+            self.error_logger.error('could not create AUCAnalyzer instance.\
             predict_ver: {}, target: {}'.format(predict_ver, self.TARGET))
             return
         nml_analyzer = Analyzer(predict_ver, 'NML')

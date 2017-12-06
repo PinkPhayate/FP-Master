@@ -3,33 +3,33 @@ import matplotlib.pyplot as plt
 import sys
 import seaborn as sns
 args = sys.argv
-def get_graph_data(filename):
+def __get_graph_data(filename):
+    def __get_accum_list(df):
+        list = []
+        count = 0
+        for i, row in df.iterrows():
+            fault = row['fault']
+            if int(fault) != 0:
+                count += 1
+                list.append( count )
+                return list
     df = pd.read_csv(filename, header=0)
-    list = get_accum_list(df)
+    list = __get_accum_list(df)
     X = df.index
     y = list
     return X,y
-def get_accum_list(df):
-    list = []
-    count = 0
-    for i, row in df.iterrows():
-        fault = row['fault']
-        if int(fault) != 0:
-            count += 1
-        list.append( count )
-    return list
 
 def compare_models(exNum):
     filename = './../Data/Research/'+str(exNum)+'nml.csv'
-    X,y = get_graph_data(filename)
+    X,y = __get_graph_data(filename)
     plt.plot(X, y, label='nml', color = 'blue')
 
     filename = './../Data/Research/'+str(exNum)+'rfn.csv'
-    X,y = get_graph_data(filename)
+    X,y = __get_graph_data(filename)
     plt.plot(X, y, label='ex3', color = 'red')
 
     filename = './../Data/Research/'+str(exNum)+'chn.csv'
-    X,y = get_graph_data(filename)
+    X,y = __get_graph_data(filename)
     plt.plot(X, y, label='chn', color = 'green')
 
     # plt.show()
@@ -38,10 +38,10 @@ def compare_models(exNum):
     plt.savefig(filename)
 
 def compare_two_models(file1,file2,svfile):
-    X,y = get_graph_data(file1)
+    X,y = __get_graph_data(file1)
     plt.plot(X, y, label='nml', color = 'blue')
 
-    X,y = get_graph_data(file2)
+    X,y = __get_graph_data(file2)
     plt.plot(X, y, label='ex3', color = 'red')
 
     # plt.show()
@@ -170,6 +170,16 @@ def draw_histgram(data1, data2, fileName):
     # plt.ylim(0, 200)
     plt.savefig(fileName)
     # raise Exception
+
+def create_boxplot_seaborn(hige, save_name, title=None):
+    plt.figure()
+    sns.boxplot(data=hige)
+    # ax.set_xticklabels(['pre', 'cre'])
+    plt.grid()
+    plt.xlabel('model')
+    plt.ylabel('p-value')
+    plt.savefig(save_name)
+
 
 if __name__ == '__main__':
     # mode = 2 if args[1]=="2" else  3
