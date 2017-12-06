@@ -187,16 +187,23 @@ def execute_ex01_prob(model):
     ex01 = Ex01(model, METRICS_DIR)
     ex01.predict_prob()
 
-def draw_metrics_distribution(model):
+def draw_metrics_distribution(model, specific_metrics=None):
     from Model.metrics import Metrics
     from Model import model_creator as mc
     from lib import figure
     metrics = Metrics(model.final_version, METRICS_DIR, model)
     pre_model = mc.retrieve_model(model.sw_name, model.final_version)
     pre_metrics = Metrics(model.previous_version, METRICS_DIR, pre_model)
+
     for column in metrics.mrg_df.columns:
+        print('col: {}'.format(column))
+        if specific_metrics is not None:
+            column = specific_metrics
         fileName = '{}/{}-{}-{}.png'.format(METRICS_DIR, model.sw_name, model.final_version, column)
-        figure.draw_violin_plot(metrics.mrg_df.ix[:, column],
+        # figure.draw_violin_plot(metrics.mrg_df.ix[:, column],
+        #                         pre_metrics.mrg_df.ix[:, column],
+        #                         fileName=fileName)
+        figure.draw_histgram(metrics.mrg_df.ix[:, column],
                                 pre_metrics.mrg_df.ix[:, column],
                                 fileName=fileName)
 
@@ -254,7 +261,8 @@ def main():
             # job = Process(target=merge_process_bug, args=(model,))
             # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
-            job = Process(target=execute_ex01, args=(model,))
+            # job = Process(target=execute_ex01, args=(model,))
+            job = Process(target=draw_metrics_distribution, args=(model,))
             jobs.append(job)
             job.start()
             """

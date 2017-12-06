@@ -144,7 +144,32 @@ def _draw_ks_linear_glaph(filename):
 def draw_violin_plot(data1, data2, fileName):
     sns.violinplot(data =[data1,data2])
     sns.despine(offset=10, trim=True)
+    plt.ylim(0, 200)
     plt.savefig(fileName)
+
+def draw_histgram(data1, data2, fileName):
+    def __remove_out_data(s):
+        q1 = s.describe()['25%']
+        q3 = s.describe()['75%']
+        return q1, q3
+
+    # sns.distplot(data1
+    q1, q3 = __remove_out_data(data1)
+    _q1, _q3  = __remove_out_data(data2)
+    min_value = _q1 if q1<_q1 else q1
+    max_value = q3 if _q3<q3 else _q3
+    print(min_value, max_value)
+    # print(max_value)
+    # raise Exception
+    plt.figure()
+    # plt.xlim(0, max_value)
+    plt.hist(data1, color='red', normed=True, alpha=0.5)
+    plt.hist(data2, color='blue', normed=True, alpha=0.5)
+    # plt.hist(data1, color='red', normed=True, alpha=0.5, range=(min_value, max_value))
+    # plt.hist(data2, color='blue', normed=True, alpha=0.5, range=(min_value, max_value))
+    # plt.ylim(0, 200)
+    plt.savefig(fileName)
+    # raise Exception
 
 if __name__ == '__main__':
     # mode = 2 if args[1]=="2" else  3

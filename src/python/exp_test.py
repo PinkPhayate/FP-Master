@@ -70,9 +70,9 @@ def test_retrieb_bug_list(model):
     import exp_execution
     exp_execution.retrieb_bug_list(model)
 
-def test_draw_metrics_distribution(model):
+def test_draw_metrics_distribution(model, specific_metrics=None):
     import exp_execution
-    exp_execution.draw_metrics_distribution(model)
+    exp_execution.draw_metrics_distribution(model, specific_metrics)
 
 # model = stub.get_derby_model()
 # test_export_process_metrics(model)
@@ -110,3 +110,4 @@ model = stub.get_hive_model()
 # test_execute_ex01(model)
 # test_execute_ex01_prob(model)
 test_draw_metrics_distribution(model)
+# test_draw_metrics_distribution(model, )
