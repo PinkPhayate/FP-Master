@@ -55,6 +55,7 @@ def compare_two_versions(version1, version2):
         print(str(pvalue)+', ', end='')
         if (THRESOLD < pvalue):
             alike_metrics.append(m)
+    print('')
     return alike_metrics
 
 def conduct_m_whitney_test(result1, result2):

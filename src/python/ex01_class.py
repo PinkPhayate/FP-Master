@@ -38,11 +38,11 @@ class Ex01(object):
         self.report_logger, self.error_logger = getLogger(logger+"_log"), getLogger("error_log")
 
 
-    def __draw_result_boxplot(self, analyzer_a, analyzer_b, index=0):
+    def draw_result_boxplot(self, analyzer_org, analyzer_dst, index=0):
         from lib import figure
         try:
-            version_a = analyzer_a.predict_version
-            version_b = analyzer_b.predict_version
+            version_a = analyzer_org.predict_version
+            version_b = analyzer_dst.predict_version
             assert version_a == version_b
         except:
             self.error_logger.error('predict version was different: {}:{}'.format(version_a, version_b)); return
@@ -51,22 +51,41 @@ class Ex01(object):
         figure_name = '{}/result_wisky-{}^{}{}.png'.format(REPORT_DIR, version_a, self.PRED_TYPE, index)
 
         if index ==0:
-            g1 = pd.DataFrame([analyzer_a.accum_accuracy0]).T
-            g2 = pd.DataFrame([analyzer_b.accum_accuracy0]).T
+            g1 = pd.DataFrame([analyzer_org.accum_accuracy0]).T
+            g2 = pd.DataFrame([analyzer_dst.accum_accuracy0]).T
         elif index == 2:
-            g1 = pd.DataFrame([analyzer_a.accum_accuracy2]).T
-            g2 = pd.DataFrame([analyzer_b.accum_accuracy2]).T
+            g1 = pd.DataFrame([analyzer_org.accum_accuracy2]).T
+            g2 = pd.DataFrame([analyzer_dst.accum_accuracy2]).T
         elif index == 3:
-            g1 = pd.DataFrame([analyzer_a.accum_accuracy3]).T
-            g2 = pd.DataFrame([analyzer_b.accum_accuracy3]).T
+            g1 = pd.DataFrame([analyzer_org.accum_accuracy3]).T
+            g2 = pd.DataFrame([analyzer_dst.accum_accuracy3]).T
         else:
-            print('designated incollect index: {}'.format(index))
-            return
+            print('designated index was incollect: {}'.format(index)); return
 
         g1.columns = [['ORG']]
         g2.columns = [['DST']]
         hige = pd.concat([g1, g2], axis=1)
         figure.create_boxplot_seaborn(hige, figure_name)
+
+    def conduct_mh_test(self, analyzer_org, analyzer_dst, index=0):
+        try:
+            assert analyzer_org.predict_version == analyzer_dst.predict_version
+            assert analyzer_org.target_sw == analyzer_dst.target_sw
+        except:
+            self.error_logger.error('predict version was different: {}:{}'.format(analyzer_org.predict_version, analyzer_dst.predict_version)); return
+
+        if index == 0:
+            pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy0, analyzer_dst.accum_accuracy0)
+        elif index == 2:
+            pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy2, analyzer_dst.accum_accuracy2)
+        elif index == 3:
+            pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy3, analyzer_dst.accum_accuracy3)
+        else:
+            print('designated index was incollect: {}'.format(index)); return
+
+        msg = 'sw: {}, version: {}, p-value{} of mann whitney u test: {}'.format(analyzer_org.target_sw, analyzer_org.predict_version, index, pvalue)
+        self.report_logger.info(msg)
+        print(msg)
 
     def predict(self):
         self.__get_logger()
@@ -156,21 +175,12 @@ class Ex01(object):
                 itg_analyzer.analyze_predict_result()
 
         # conducy mann whitneyu test
-        pvalue = st.conduct_m_whitney_test(rfn_analyzer.accum_precision0, itg_analyzer.accum_precision0)
-        msg = 'sw: {}, version: {}, p-value 0 of mann whitney u test: {}'.format(self.model.sw_name, self.model.final_version, pvalue)
-        self.report_logger.info(msg)
-        print(msg)
-        pvalue = st.conduct_m_whitney_test(rfn_analyzer.accum_precision2, itg_analyzer.accum_precision2)
-        msg = 'sw: {}, version: {}, p-value 2 of mann whitney u test: {}'.format(self.model.sw_name, self.model.final_version, pvalue)
-        self.report_logger.info(msg)
-        print(msg)
-        pvalue = st.conduct_m_whitney_test(rfn_analyzer.accum_precision3, itg_analyzer.accum_precision3)
-        msg = 'sw: {}, version: {}, p-value 3 of mann whitney u test: {}'.format(self.model.sw_name, self.model.final_version, pvalue)
-        self.report_logger.info(msg)
-        print(msg)
+        self.conduct_mh_test(rfn_analyzer, itg_analyzer, index=0)
+        self.conduct_mh_test(rfn_analyzer, itg_analyzer, index=2)
+        self.conduct_mh_test(rfn_analyzer, itg_analyzer, index=3)
 
         # draw voxplot graph
-        self.__draw_result_boxplot(rfn_analyzer, itg_analyzer)
+        self.draw_result_boxplot(rfn_analyzer, itg_analyzer)
 
 
         # export report
