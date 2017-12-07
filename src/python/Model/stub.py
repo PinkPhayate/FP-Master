@@ -9,6 +9,16 @@ def get_derby_model():
     model.previous_version = "10.12.1.1"
     return model
 
+def get_poi_model():
+    model = EXP_MODEL(sw='poi',
+                      fv='3.17',
+                      bvs=['4.0.0-SNAPSHOT'],
+                      pv='3.16',
+                      cv='3.17-beta1',
+                      dn='ApachePoi')
+    model.previous_version = "3.16"
+    return model
+
 def get_derby_bug_adjust_model():
     model = EXP_MODEL(sw='derby',
                       fv='10.9',

@@ -57,9 +57,12 @@ def test_execute_ex01(model):
     print('sw name: {}, predict version: {}, previousversion: {}'
         .format(model.sw_name, model.final_version, model.previous_version))
     ex01 = Ex01(model, METRICS_DIR)
-    ex01.ITER = 5
+    ex01.ITER = 10
     # alike_metrics = st.compare_two_versions(model.final_version, model.prev)
-    ex01.predict(box_plotting=False, result_exporting=False)
+    try:
+        ex01.predict(box_plotting=False, result_exporting=False)
+    except Exception as e:
+        print('couldnt execute experience. reason: {}'.format(e))
 
 def test_execute_ex01_prob(model):
     from ex01_class import Ex01
@@ -107,9 +110,13 @@ config_logger()
 # model = stub.get_derby_bug_adjust_model()
 # model = stub.get_derby_model()
 # model = stub.get_hive_model()
+model = stub.get_poi_model()
+
 model_dict = model_creator.get_model_dictionary()
 models = []
 [models.extend(ms) for _, ms in model_dict.items()]
+for model in models:
+    test_execute_ex01(model)
 
 # print(model.final_version)
 # test_export_process_bug_report(model)
@@ -124,6 +131,4 @@ models = []
 # test_execute_ex01_prob(model)
 # test_draw_metrics_distribution(model)
 # test_draw_metrics_distribution(model, )
-for model in models:
-    test_execute_ex01(model)
 # map(lambda x: test_execute_ex01(x), models)

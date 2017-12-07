@@ -174,6 +174,8 @@ class Ex01(object):
                 itg_analyzer.calculate()
                 itg_analyzer.analyze_predict_result()
 
+        print('feature inportance: {}'.format(importance))
+
         # conducy mann whitneyu test
         self.conduct_mh_test(rfn_analyzer, itg_analyzer, index=0)
         self.conduct_mh_test(rfn_analyzer, itg_analyzer, index=2)
