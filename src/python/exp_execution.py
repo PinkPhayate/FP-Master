@@ -207,6 +207,18 @@ def draw_metrics_distribution(model, specific_metrics=None):
                                 pre_metrics.mrg_df.ix[:, column],
                                 fileName=fileName)
 
+def execute_grid_search(model):
+    import grid_searcher as gs
+    report_logger, error_logger = get_logger()
+    training_m, evaluate_m = gs.create_dataset(model)
+    best_score_, best_params_ = gs.find_best_param(training_m, evaluate_m)
+    report_str = 'sw: {}, version: {}, best params: {}, score: {}'\
+        .format(model.sw_name, model.final_version, best_params_, best_score_)
+    report_logger.info(report_str)
+    return report_str
+
+
+
 def config_logger():
     import logging
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -261,8 +273,9 @@ def main():
             # job = Process(target=merge_process_bug, args=(model,))
             # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
-            job = Process(target=execute_ex01, args=(model,))
+            # job = Process(target=execute_ex01, args=(model,))
             # job = Process(target=draw_metrics_distribution, args=(model,))
+            job = Process(target=execute_grid_search, args=(model,))
             jobs.append(job)
             job.start()
             """

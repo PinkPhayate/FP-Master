@@ -2,6 +2,7 @@ from Model import stub
 import subprocess
 import configparser
 from Model import model_creator
+import logging
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
@@ -87,12 +88,18 @@ def test_draw_metrics_distribution(model, specific_metrics=None):
     import exp_execution
     exp_execution.draw_metrics_distribution(model, specific_metrics)
 
+def test_execute_grid_search(model):
+    import exp_execution
+    report_str = exp_execution.execute_grid_search(model)
+    debug_logger = logging.getLogger("debug_log")
+    debug_logger.info(report_str)
+
+
 # model = stub.get_derby_model()
 # test_export_process_metrics(model)
 # merge_process_product(model)
 
 def config_logger():
-    import logging
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     sh = logging.StreamHandler()
     sh.setFormatter(formatter)
@@ -100,7 +107,7 @@ def config_logger():
     debug_logger = logging.getLogger("debug_log")
     debug_logger.addHandler(sh)
     debug_logger.setLevel(logging.DEBUG)
-    fh = logging.FileHandler(filename=LOG_DIR+"debug.log")
+    fh = logging.FileHandler(filename=LOG_DIR+"/debug.log")
     fh.setFormatter(formatter)
     debug_logger.addHandler(fh)
 
@@ -112,11 +119,11 @@ config_logger()
 # model = stub.get_hive_model()
 model = stub.get_poi_model()
 
-model_dict = model_creator.get_model_dictionary()
-models = []
-[models.extend(ms) for _, ms in model_dict.items()]
-for model in models:
-    test_execute_ex01(model)
+# model_dict = model_creator.get_model_dictionary()
+# models = []
+# [models.extend(ms) for _, ms in model_dict.items()]
+# for model in models:
+#     test_execute_ex01(model)
 
 # print(model.final_version)
 # test_export_process_bug_report(model)
@@ -131,4 +138,4 @@ for model in models:
 # test_execute_ex01_prob(model)
 # test_draw_metrics_distribution(model)
 # test_draw_metrics_distribution(model, )
-# map(lambda x: test_execute_ex01(x), models)
+test_execute_grid_search(model, )

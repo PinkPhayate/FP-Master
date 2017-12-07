@@ -15,7 +15,7 @@ inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 EXECUTION_MODE = inifile.get('env', 'mode')
 ENV = inifile.get('env', 'locale')
-METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics/'
+METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
 
 def create_dataset(model):
     ver, predict_ver = model.previous_version, model.final_version
@@ -32,10 +32,9 @@ def find_best_param(training_m, evaluate_m):
 
 
     params = {
-              'n_estimators': [10, 50, 100, 500],
+              'n_estimators': [3, 5, 10, 50, 100],
               'max_depth': list(range(1, 10)),
               'class_weight': ['balanced', None],
-              'oob_score': [True, False],
               'max_features': [None, 'auto'],
               'min_samples_split': [3, 5, 10, 20, 30]
     }
@@ -50,10 +49,10 @@ def find_best_param(training_m, evaluate_m):
                                scoring=f1_scorer
                                )
     grid_search.fit(X_resampled, y_resampled)
+    return grid_search.best_score_, grid_search.best_params_
 
-    print(grid_search.best_score_)  # 最も良かったスコア
-    print(grid_search.best_params_)  # 上記を記録したパラメータの組み合わせ
-
-model = stub.get_hive_model()
-training_m, evaluate_m = create_dataset(model)
-find_best_param(training_m, evaluate_m)
+if __name__ == '__main__':
+    model = stub.get_hive_model()
+    # model = stub.get_derby_model()
+    training_m, evaluate_m = create_dataset(model)
+    find_best_param(training_m, evaluate_m)
