@@ -87,7 +87,7 @@ class Ex01(object):
         self.report_logger.info(msg)
         print(msg)
 
-    def predict(self):
+    def predict(self, box_plotting=True, result_exporting=True):
         self.__get_logger()
         ver, predict_ver = self.model.previous_version, self.model.final_version
         pre_model = mc.retrieve_model(self.model.sw_name, self.model.final_version)
@@ -165,7 +165,7 @@ class Ex01(object):
             #     training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             alike_df = evaluate_m.get_specific_df(self.alike_metrics)
-            rfn_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv")
+            itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv")
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
             report_df = predictor.export_report(predict_ver)
@@ -180,7 +180,8 @@ class Ex01(object):
         self.conduct_mh_test(rfn_analyzer, itg_analyzer, index=3)
 
         # draw voxplot graph
-        self.draw_result_boxplot(rfn_analyzer, itg_analyzer)
+        if box_plotting:
+            self.draw_result_boxplot(rfn_analyzer, itg_analyzer)
 
 
         # export report
@@ -191,14 +192,16 @@ class Ex01(object):
         nml_analyzer.export(target_sw=self.TARGET, df=df, predictor_type=self.PRED_TYPE)    # どのanalyzerクラスでも良い
 
         nml_df = nml_analyzer.calculate_num_report_averge(self.ITER)
-        nml_analyzer.export_count_report(target_sw=self.TARGET, df=nml_df,
-                                         predictor_type=self.PRED_TYPE)
         rfn_df = rfn_analyzer.calculate_num_report_averge(self.ITER)
-        rfn_analyzer.export_count_report(target_sw=self.TARGET, df=rfn_df,
-                                         predictor_type=self.PRED_TYPE)
         itg_df = itg_analyzer.calculate_num_report_averge(self.ITER)
-        itg_analyzer.export_count_report(target_sw=self.TARGET, df=itg_df,
-                                         predictor_type=self.PRED_TYPE)
+
+        if result_exporting:
+            nml_analyzer.export_count_report(target_sw=self.TARGET, df=nml_df,
+                                             predictor_type=self.PRED_TYPE)
+            rfn_analyzer.export_count_report(target_sw=self.TARGET, df=rfn_df,
+                                             predictor_type=self.PRED_TYPE)
+            itg_analyzer.export_count_report(target_sw=self.TARGET, df=itg_df,
+                                             predictor_type=self.PRED_TYPE)
 
     def predict_prob(self):
         self.__get_logger()

@@ -1,6 +1,7 @@
 from Model import stub
 import subprocess
 import configparser
+from Model import model_creator
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
@@ -42,15 +43,23 @@ def test_merge_process_product(model):
 def test_get_exp_versions():
     from Model import model_creator
     model_dict = model_creator.get_model_dictionary()
-    print(model_dict)
+    models = []
+    [models.extend(ms) for _, ms in model_dict.items()]
+    print(str(len(models)))
+    for model in models:
+        print(model.sw_name, model.previous_version)
 
 def test_execute_ex01(model):
     from ex01_class import Ex01
     from lib import statistic as st
+    if model.previous_version == '':
+        return
+    print('sw name: {}, predict version: {}, previousversion: {}'
+        .format(model.sw_name, model.final_version, model.previous_version))
     ex01 = Ex01(model, METRICS_DIR)
     ex01.ITER = 5
     # alike_metrics = st.compare_two_versions(model.final_version, model.prev)
-    ex01.predict()
+    ex01.predict(box_plotting=False, result_exporting=False)
 
 def test_execute_ex01_prob(model):
     from ex01_class import Ex01
@@ -94,11 +103,14 @@ def config_logger():
 
 config_logger()
 # test_get_exp_versions()
-
 # model = stub.get_bug_process_merge_stub()
 # model = stub.get_derby_bug_adjust_model()
 # model = stub.get_derby_model()
-model = stub.get_hive_model()
+# model = stub.get_hive_model()
+model_dict = model_creator.get_model_dictionary()
+models = []
+[models.extend(ms) for _, ms in model_dict.items()]
+
 # print(model.final_version)
 # test_export_process_bug_report(model)
 # test_merge_process_product(model)
@@ -108,7 +120,10 @@ model = stub.get_hive_model()
 # test_get_bug_list_sol1(model)
 # test_merge_process_bug(model)
 # test_merge_process_bug_derby(model)
-test_execute_ex01(model)
+# test_execute_ex01(model)
 # test_execute_ex01_prob(model)
 # test_draw_metrics_distribution(model)
 # test_draw_metrics_distribution(model, )
+for model in models:
+    test_execute_ex01(model)
+# map(lambda x: test_execute_ex01(x), models)
