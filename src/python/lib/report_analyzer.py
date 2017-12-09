@@ -2,11 +2,12 @@ import pandas as pd
 from lib.auc import AUC
 import sklearn.metrics as skm
 from sklearn.exceptions import UndefinedMetricWarning
+from sklearn.utils import column_or_1d
 import configparser
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
-REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/'
+REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result/additional_exp/'
 
 
 class Analyzer(object):
@@ -262,6 +263,7 @@ class AUCAnalyzer(Analyzer):
         self.calculate_4()
 
     def calculate_2indict(self, __df):
+        from sklearn.metrics import f1_score
         if __df[['actual']].sum()[0] < 1:
             return 0, 0, 0
         if __df[['predict']].sum()[0] < 1:
@@ -273,37 +275,39 @@ class AUCAnalyzer(Analyzer):
                                       y_pred=__df[['predict']])
         precision = skm.precision_score(y_true=__df[['actual']],
                                         y_pred=__df[['predict']])
-        return recall, accuracy, precision
+        f1 = skm.f1_score(y_true=__df[['actual']],
+                          y_pred=__df[['predict']])
+        return recall, precision, f1
 
     def calculate_0(self):
         __df = self.report_df.copy()
-        recall, accuracy, precision = self.calculate_2indict(__df)
+        recall, precision, f1 = self.calculate_2indict(__df)
         self.accum_recall0.append(recall)
-        self.accum_accuracy0.append(accuracy)
+        self.accum_accuracy0.append(f1)
         self.accum_precision0.append(precision)
 
     def calculate_2(self):
         __df = self.report_df[self.report_df.apply(
             lambda x: x['isModified'] == 0, axis=1)]
-        recall, accuracy, precision = self.calculate_2indict(__df)
+        recall, precision, f1 = self.calculate_2indict(__df)
         self.accum_recall2.append(recall)
-        self.accum_accuracy2.append(accuracy)
+        self.accum_accuracy2.append(f1)
         self.accum_precision2.append(precision)
 
     def calculate_3(self):
         __df = self.report_df[self.report_df.apply(
             lambda x: x['isModified'] == 1, axis=1)]
-        recall, accuracy, precision = self.calculate_2indict(__df)
+        recall, precision, f1 = self.calculate_2indict(__df)
         self.accum_recall3.append(recall)
-        self.accum_accuracy3.append(accuracy)
+        self.accum_accuracy3.append(f1)
         self.accum_precision3.append(precision)
 
     def calculate_4(self):
         __df = self.report_df[self.report_df.apply(
             lambda x: x['isNew'] == 1, axis=1)]
-        recall, accuracy, precision = self.calculate_2indict(__df)
+        recall, precision, f1 = self.calculate_2indict(__df)
         self.accum_recall4.append(recall)
-        self.accum_accuracy4.append(accuracy)
+        self.accum_accuracy4.append(f1)
         self.accum_precision4.append(precision)
 
     def count_fp_num(self, df):

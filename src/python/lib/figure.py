@@ -1,34 +1,35 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import sys
+import seaborn as sns
 args = sys.argv
-def get_graph_data(filename):
+def __get_graph_data(filename):
+    def __get_accum_list(df):
+        list = []
+        count = 0
+        for i, row in df.iterrows():
+            fault = row['fault']
+            if int(fault) != 0:
+                count += 1
+                list.append( count )
+                return list
     df = pd.read_csv(filename, header=0)
-    list = get_accum_list(df)
+    list = __get_accum_list(df)
     X = df.index
     y = list
     return X,y
-def get_accum_list(df):
-    list = []
-    count = 0
-    for i, row in df.iterrows():
-        fault = row['fault']
-        if int(fault) != 0:
-            count += 1
-        list.append( count )
-    return list
 
 def compare_models(exNum):
     filename = './../Data/Research/'+str(exNum)+'nml.csv'
-    X,y = get_graph_data(filename)
+    X,y = __get_graph_data(filename)
     plt.plot(X, y, label='nml', color = 'blue')
 
     filename = './../Data/Research/'+str(exNum)+'rfn.csv'
-    X,y = get_graph_data(filename)
+    X,y = __get_graph_data(filename)
     plt.plot(X, y, label='ex3', color = 'red')
 
     filename = './../Data/Research/'+str(exNum)+'chn.csv'
-    X,y = get_graph_data(filename)
+    X,y = __get_graph_data(filename)
     plt.plot(X, y, label='chn', color = 'green')
 
     # plt.show()
@@ -37,10 +38,10 @@ def compare_models(exNum):
     plt.savefig(filename)
 
 def compare_two_models(file1,file2,svfile):
-    X,y = get_graph_data(file1)
+    X,y = __get_graph_data(file1)
     plt.plot(X, y, label='nml', color = 'blue')
 
-    X,y = get_graph_data(file2)
+    X,y = __get_graph_data(file2)
     plt.plot(X, y, label='ex3', color = 'red')
 
     # plt.show()
@@ -139,6 +140,45 @@ def _draw_ks_linear_glaph(filename):
     plt.ylim(0, 1.2)
 
     plt.savefig(filename)
+
+def draw_violin_plot(data1, data2, fileName):
+    sns.violinplot(data =[data1,data2])
+    sns.despine(offset=10, trim=True)
+    plt.ylim(0, 200)
+    plt.savefig(fileName)
+
+def draw_histgram(data1, data2, fileName):
+    def __remove_out_data(s):
+        q1 = s.describe()['25%']
+        q3 = s.describe()['75%']
+        return q1, q3
+
+    # sns.distplot(data1
+    q1, q3 = __remove_out_data(data1)
+    _q1, _q3  = __remove_out_data(data2)
+    min_value = _q1 if q1<_q1 else q1
+    max_value = q3 if _q3<q3 else _q3
+    print(min_value, max_value)
+    # print(max_value)
+    # raise Exception
+    plt.figure()
+    # plt.xlim(0, max_value)
+    plt.hist(data1, color='red', normed=True, alpha=0.5)
+    plt.hist(data2, color='blue', normed=True, alpha=0.5)
+    # plt.hist(data1, color='red', normed=True, alpha=0.5, range=(min_value, max_value))
+    # plt.hist(data2, color='blue', normed=True, alpha=0.5, range=(min_value, max_value))
+    # plt.ylim(0, 200)
+    plt.savefig(fileName)
+    # raise Exception
+
+def create_boxplot_seaborn(hige, save_name, title=None):
+    plt.figure()
+    sns.boxplot(data=hige)
+    # ax.set_xticklabels(['pre', 'cre'])
+    plt.grid()
+    plt.xlabel('model')
+    plt.ylabel('p-value')
+    plt.savefig(save_name)
 
 
 if __name__ == '__main__':

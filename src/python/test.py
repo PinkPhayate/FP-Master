@@ -1,5 +1,10 @@
 from lib.auc import AUC
 import pandas as pd
+import configparser
+inifile = configparser.SafeConfigParser()
+inifile.read('./config.ini')
+ENV = inifile.get('env', 'locale')
+METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
 
 def test_circulate_auc():
     df = pd.read_csv('/Users/phayate/Dropbox/STUDY/Result/4.2.0ITG-report.csv',
@@ -53,4 +58,10 @@ def test_hoge():
     print(h2.df)
     print(h3.df)
 
-test_hoge()
+def test_retrieve_model():
+    from Model import model_creator as mc
+    model = mc.retrieve_model('derby', '10.13.1.1')
+    print(model.sw_name, model.final_version)
+
+# test_hoge()
+test_retrieve_model()

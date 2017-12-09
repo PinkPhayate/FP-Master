@@ -1,0 +1,38 @@
+
+# プロセスメトリクスの算出
+"""
+- DIMA.jarの場所
+- 新バージョンのsrcディレクトリ
+- 旧バージョンのsrcディレクトリ
+- 出力したいバージョン名
+- メトリクスを取得する拡張子
+
+ex) java -jar /Users/phayate/Dropbox/STUDY/Metrics/DIMA-2.4.jar /Users/phayate/src/ApacheSolr/6.6.0/solr /Users/phayate/src/ApacheSolr/6.5.0/solr 6.6.0 java
+"""
+
+
+# プロセスメトリクスと欠陥情報をマージ
+"""
+- bug_process_merger.pyのパス
+- バグモジュールのパス
+- プロセスメトリクスのパス
+- 完成品の名前(パスも)
+- 第五引数をなしにできるように調整する
+
+バグレポートに買いてあるバグモジュール名前には揺らぎがある。
+今回は、そのソフトウェア名以下のパスから最後までをパスとする。
+そのあと、UFJで出力されたレポートとすり合わせる予定
+
+ex) python /Users/phayate/Documents/FP-master/src/python/tmp/script/bug_process_merger.py /Users/phayate/Dropbox/STUDY/Metrics/Solr/bug/slr_4.4.0_bgmd.csv /Users/phayate/Dropbox/STUDY/Metrics/Solr/process/ProcessMetrics-4.5.0.csv /Users/phayate/Dropbox/STUDY/Metrics/Solr/process-bug/process-bug-4.5.0.csv solr
+"""
+
+# プロダクトメトリクスとマージ
+"""
+- MO-1.1.jarのパス
+- UFJから取得したファイルのパス
+- プロセスメトリクスと欠陥情報を結合したファイルのパス
+- 最終的なバージョン名
+- 最終的なメトリクスファイルの置き場
+java -jar /Users/phayate/Dropbox/STUDY/Metrics/MO-1.1.jar /Users/phayate/Dropbox/STUDY/JR/metrics-data/Apache-Derby/export-metrics/derbyMetrics_v10.10.1.1.csv /Users/phayate/Dropbox/STUDY/Metrics/Derby/process-bug/process-bug-10.10.csv 10.10 /Users/phayate/Dropbox/STUDY/Metrics/Derby/all/
+
+"""

@@ -44,7 +44,7 @@ def ks_2samp(m1, m2):
 
 
 def compare_two_versions(version1, version2):
-    metrics = ['pd1','pd2','pd3','pd4','pd5','pd6','pc1','pc2','pc3','pc4']
+    metrics = version1.mrg_df.columns
     alike_metrics = []
     for m in metrics:
         if EXECUTION_MODE == 'debug':
@@ -55,4 +55,10 @@ def compare_two_versions(version1, version2):
         print(str(pvalue)+', ', end='')
         if (THRESOLD < pvalue):
             alike_metrics.append(m)
+    print('')
     return alike_metrics
+
+def conduct_m_whitney_test(result1, result2):
+    from scipy import stats
+    result = stats.mannwhitneyu(result1, result2)
+    return result.pvalue

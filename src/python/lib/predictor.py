@@ -44,6 +44,7 @@ class Predictor(object):
     def calculate_diagram_saver(self, actual, pred, filename):
         df = pd.concat([ actual, pred ], axis=1)
         df.columns = ['fault', 'ev_value']
+        # print(df['fault'])
         evaluater = auc.AUC(df)
         diagram_value = evaluater. circulate_auc
         # evaluater.save_ev_values( filename=filename )
@@ -129,11 +130,13 @@ class RFPredictor(Predictor):
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
         model = RandomForestClassifier(
-            oob_score=True,
-            class_weight='balanced',
-            max_depth=3,
-            n_estimators=100,
-            min_samples_leaf=3
+            oob_score=False,
+            class_weight=None,
+            # max_features="auto",
+            max_depth=9,
+            n_estimators=50,
+            min_samples_split=3,
+            # min_samples_leaf=3
         )
         model.fit(ev_data, column_or_1d(dv_data))
 
