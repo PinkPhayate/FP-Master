@@ -273,9 +273,9 @@ def main():
             # job = Process(target=merge_process_bug, args=(model,))
             # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
-            # job = Process(target=execute_ex01, args=(model,))
+            job = Process(target=execute_ex01, args=(model,))
             # job = Process(target=draw_metrics_distribution, args=(model,))
-            job = Process(target=execute_grid_search, args=(model,))
+            # job = Process(target=execute_grid_search, args=(model,))
             jobs.append(job)
             job.start()
             """

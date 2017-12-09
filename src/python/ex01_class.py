@@ -91,7 +91,7 @@ class Ex01(object):
         self.__get_logger()
         ver, predict_ver = self.model.previous_version, self.model.final_version
         pre_model = mc.retrieve_model(self.model.sw_name, self.model.final_version)
-        predictor_rep = PredictorRepository(predict_ver, ver)
+        predictor_rep = PredictorRepository(predict_ver, self.model)
         training_m = Metrics(ver, self.METRICS_DIR, pre_model)
         evaluate_m = Metrics(predict_ver, self.METRICS_DIR, self.model)
         self.alike_metrics = st.compare_two_versions(training_m, evaluate_m)
@@ -208,7 +208,7 @@ class Ex01(object):
     def predict_prob(self):
         self.__get_logger()
         ver, predict_ver = self.model.previous_version, self.model.final_version
-        predictor_rep = PredictorRepository(predict_ver, ver)
+        predictor_rep = PredictorRepository(predict_ver, self.model)
         training_m = Metrics(ver, self.METRICS_DIR, self.model)
         evaluate_m = Metrics(predict_ver, self.METRICS_DIR, self.model)
         self.alike_metrics = st.compare_two_versions(training_m, evaluate_m)

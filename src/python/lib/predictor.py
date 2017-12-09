@@ -17,9 +17,9 @@ class Predictor(object):
     is_new_df = None
     report_df = None
 
-    def __init__(self, pv, v, model_type):
+    def __init__(self, pv, v_model, model_type):
         self.predict_ver = pv
-        self.ver = v
+        self.ver = v_model
         self.model_type = model_type
         self.report_df = None
 
@@ -123,12 +123,22 @@ class Predictor(object):
         return None, None
 
 class RFPredictor(Predictor):
-    def __init__(self, pv, v, model_type):
-        super(RFPredictor, self).__init__(pv, v, model_type)
+    def __init__(self, pv, v_model, model_type):
+        super(RFPredictor, self).__init__(pv, v_model, model_type)
 
-    def train_model(self, ev_data, dv_data):
-        # normalize
-        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+    def __get_optimized_model(self):
+        param_d = self.ver.param_dictionary
+        if param_d is not None:
+            model = RandomForestClassifier(
+                oob_score=False,
+                class_weight=None if param_d["class_weight"]=='None' else param_d['class_weight'],
+                max_features=None if param_d["max_features"]=='None' else param_d['max_features'],
+                max_depth=param_d['max_depth'],
+                n_estimators=param_d['n_estimators'],
+                min_samples_split=param_d['min_samples_split'],
+                # min_samples_leaf=3
+            )
+            return model
         model = RandomForestClassifier(
             oob_score=False,
             class_weight=None,
@@ -138,6 +148,12 @@ class RFPredictor(Predictor):
             min_samples_split=3,
             # min_samples_leaf=3
         )
+        return model
+
+    def train_model(self, ev_data, dv_data):
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        model = self.__get_optimized_model()
         model.fit(ev_data, column_or_1d(dv_data))
 
         return model

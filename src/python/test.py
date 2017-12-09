@@ -62,6 +62,14 @@ def test_retrieve_model():
     from Model import model_creator as mc
     model = mc.retrieve_model('derby', '10.13.1.1')
     print(model.sw_name, model.final_version)
+def test_exp_model_set_param_dict():
+    from Model import model_creator
+    models = []
+    model_dict = model_creator.get_model_dictionary()
+    [models.extend(ms) for _, ms in model_dict.items()]
+    for model in models:
+        print(model.param_dictionary)
 
 # test_hoge()
-test_retrieve_model()
+# test_retrieve_model()
+test_exp_model_set_param_dict()
