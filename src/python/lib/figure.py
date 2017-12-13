@@ -172,8 +172,10 @@ def draw_histgram(data1, data2, fileName):
     # raise Exception
 
 def create_boxplot_seaborn(hige, save_name, title=None):
-    plt.figure()
-    sns.boxplot(data=hige)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.boxplot(hige)
+    # sns.boxplot(data=hige)
     # ax.set_xticklabels(['pre', 'cre'])
     plt.grid()
     plt.xlabel('model')
