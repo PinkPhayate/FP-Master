@@ -211,12 +211,14 @@ def execute_grid_search(model):
     import grid_searcher as gs
     report_logger, error_logger = get_logger()
     training_m, evaluate_m = gs.create_dataset(model)
-    best_score_, best_params_ = gs.find_best_param(training_m, evaluate_m)
+    # random forest
+    # best_score_, best_params_ = gs.find_best_param(training_m, evaluate_m)
+    #  xgboostr
+    best_score_, best_params_ = gs.find_best_xgboost_param(training_m, evaluate_m)
     report_str = 'sw: {}, version: {}, best params: {}, score: {}'\
         .format(model.sw_name, model.final_version, best_params_, best_score_)
     report_logger.info(report_str)
     return report_str
-
 
 
 def config_logger():
@@ -240,7 +242,7 @@ def config_logger():
     report_logger.addHandler(fh)
 
 def restrict_models(model_dict):
-    skip_array = []
+    skip_array = ['solr']
     model_dict_copy = model_dict.copy()
     for version in model_dict.keys():
         if version in skip_array:
@@ -248,11 +250,11 @@ def restrict_models(model_dict):
     return model_dict_copy
 
 def retrieb_models(model_dict):
-    target_array = ['log4j', 'velocity']
-    model_dict_copy = {}
+    target_array = ['derby']
+    model_dict_copy = model_dict.copy()
     for version in model_dict.keys():
-        if version in target_array:
-            model_dict_copy[version] = model_dict[version]
+        if version not in target_array:
+            del model_dict_copy[version]
     return model_dict_copy
 
 def main():
@@ -261,7 +263,7 @@ def main():
     config_logger()
     model_dict = model_creator.get_model_dictionary()
     jobs = []
-    # model_dict = retrieb_models(model_dict)
+    model_dict = retrieb_models(model_dict)
     for _, models in model_dict.items():
         for model in models:
             """
@@ -273,9 +275,9 @@ def main():
             # job = Process(target=merge_process_bug, args=(model,))
             # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
-            job = Process(target=execute_ex01, args=(model,))
+            # job = Process(target=execute_ex01, args=(model,))
             # job = Process(target=draw_metrics_distribution, args=(model,))
-            # job = Process(target=execute_grid_search, args=(model,))
+            job = Process(target=execute_grid_search, args=(model,))
             jobs.append(job)
             job.start()
             """

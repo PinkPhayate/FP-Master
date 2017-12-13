@@ -51,6 +51,28 @@ def find_best_param(training_m, evaluate_m):
     grid_search.fit(X_resampled, y_resampled)
     return grid_search.best_score_, grid_search.best_params_
 
+def find_best_xgboost_param(training_m, evaluate_m):
+    sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+    X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
+    # グリッドサーチに必要なクラスのインポート
+    import xgboost as xgb
+    # サーチするパラメータは範囲を指定
+    params = {'max_depth': [3, 5, 10], 'learning_rate': [0.05, 0.1], 'max_depth': [3, 5, 10, 100], 'subsample': [0.8, 0.85, 0.9, 0.95], 'colsample_bytree': [0.5, 1.0]}
+    # モデルのインスタンス作成
+    clf = xgb.XGBClassifier()
+
+    from sklearn.metrics import f1_score
+    from sklearn.metrics import make_scorer
+    f1_scorer = make_scorer(f1_score, pos_label=1)
+
+    grid_search = GridSearchCV(clf,  # 分類器を渡す
+                               param_grid=params,  # 試行してほしいパラメータを渡す
+                               cv=10,  # 10-Fold CV で汎化性能を調べる
+                               scoring=f1_scorer
+                               )
+    grid_search.fit(X_resampled, y_resampled)
+    return grid_search.best_score_, grid_search.best_params_
+
 if __name__ == '__main__':
     model = stub.get_hive_model()
     # model = stub.get_derby_model()
