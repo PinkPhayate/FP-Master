@@ -263,7 +263,7 @@ def main():
     config_logger()
     model_dict = model_creator.get_model_dictionary()
     jobs = []
-    model_dict = retrieb_models(model_dict)
+    # model_dict = retrieb_models(model_dict)
     for _, models in model_dict.items():
         for model in models:
             """
@@ -275,9 +275,9 @@ def main():
             # job = Process(target=merge_process_bug, args=(model,))
             # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
-            # job = Process(target=execute_ex01, args=(model,))
+            job = Process(target=execute_ex01, args=(model,))
             # job = Process(target=draw_metrics_distribution, args=(model,))
-            job = Process(target=execute_grid_search, args=(model,))
+            # job = Process(target=execute_grid_search, args=(model,))
             jobs.append(job)
             job.start()
             """

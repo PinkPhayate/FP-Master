@@ -1,5 +1,5 @@
 from lib.predictor import RFPredictor, LGPredictor, SVCPredictor
-from lib.predictor import TreePredictor, SVRPredictor, BoostingPredictor
+from lib.predictor import TreePredictor, SVRPredictor, BoostingPredictor, XGBPredictor
 class PredictorRepository(object):
     def __init__(self, predict_ver, ver_model):
         self.predict_ver = predict_ver

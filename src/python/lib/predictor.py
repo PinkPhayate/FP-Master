@@ -336,3 +336,67 @@ class BoostingPredictor(Predictor):
         # return self.calculate_auc_score(dv_data, predict),\
         #                                 model.feature_importances_
         return None, None
+
+class XGBPredictor(Predictor):
+    def __init__(self, pv, v_model, model_type):
+        super(XGBPredictor, self).__init__(pv, v_model, model_type)
+
+    def __get_optimized_model(self):
+        from xgboost import XGBClassifier
+        param_d = self.ver.param_dictionary
+        if param_d is not None:
+            model = XGBClassifier(
+                colsample_bytree=param_d["colsample_bytree"],
+                learning_rate=param_d["learning_rate"],
+                max_depth=param_d["max_depth"],
+                subsample=param_d['subsample'],
+            )
+            return model
+        model = XGBClassifier()
+        return model
+
+    def train_model(self, ev_data, dv_data):
+        if self.model_type == "ITG":
+            model = self.__get_optimized_model()
+        else:
+            from xgboost import XGBClassifier
+            model = XGBClassifier()
+        model.fit(ev_data, column_or_1d(dv_data))
+        return model
+
+    def predict_proba(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        output = model.predict_proba(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output).ix[:,1:]
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict],axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
+        df.loc[:, 'predict'] = df.apply(lambda x: float(x['predict']), axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict),\
+                                            model.feature_importances_
+
+    def predict_test_data(self, model, ev_data, dv_data, filename):
+        # save for write file about metrics and predict and actualy
+        paramater = ev_data.copy()
+        # normalize
+        # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
+        output = model.predict(ev_data)
+
+        # ev_data = pd.concat([paramater, dv_data],axis=1)
+        predict = pd.DataFrame(output)
+        predict.columns = [['predict']]
+        df = pd.concat([paramater, predict], axis=1)
+        dv_data.columns = [['actual']]
+        df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
+        self.report_df = df
+
+        return self.calculate_auc_score(dv_data, predict),\
+                                        None

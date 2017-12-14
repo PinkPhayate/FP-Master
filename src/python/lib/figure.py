@@ -171,15 +171,31 @@ def draw_histgram(data1, data2, fileName):
     plt.savefig(fileName)
     # raise Exception
 
-def create_boxplot_seaborn(hige, save_name, title=None):
+# def create_boxplot_seaborn(hige, save_name, title=None):
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111)
+#     ax.set_xticklabels(hige.columns)
+#     print(hige)
+#     bp = ax.boxplot(hige)
+#     # sns.boxplot(data=hige)
+#     # ax.set_xticklabels(['pre', 'cre'])
+#     plt.grid()
+#     plt.xlabel('model')
+#     plt.ylabel('p-value')
+#     plt.savefig(save_name)
+def create_boxplot_seaborn(df, save_name, title=None):
+    # create graph just one version
+    hige = ( df['ORG'], df['DST'])
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.boxplot(hige)
-    # sns.boxplot(data=hige)
-    # ax.set_xticklabels(['pre', 'cre'])
+    ax.set_xticklabels(df.columns)
+
+    bp = ax.boxplot(hige)
+
     plt.grid()
-    plt.xlabel('model')
-    plt.ylabel('p-value')
+    plt.xlabel('MODEL')
+    plt.ylabel('DIAGRAM VALUE')
+    # plt.title(title)
     plt.savefig(save_name)
 
 

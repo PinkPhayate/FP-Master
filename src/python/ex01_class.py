@@ -16,8 +16,8 @@ ENV = inifile.get('env', 'locale')
 
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
-    ITER = 50
-    PRED_TYPE = 'rf'
+    ITER = 100
+    PRED_TYPE = 'xgb'
     model = None
     METRICS_DIR = None
     TARGET = None
