@@ -18,5 +18,6 @@ class PredictorRepository(object):
             return SVRPredictor(self.predict_ver, self.ver_model, model_type)
         if predictor_type == 'bst':
             return BoostingPredictor(self.predict_ver, self.ver_model, model_type)
-
+        if predictor_type == 'xgb':
+            return XGBPredictor(self.predict_ver, self.ver_model, model_type)
         return None
