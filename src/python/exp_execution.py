@@ -257,6 +257,14 @@ def retrieb_models(model_dict):
             del model_dict_copy[version]
     return model_dict_copy
 
+def retrieb_model_specified_version(models):
+    target_versions = ['6.5.0']
+    retriebed_models = []
+    for model in models:
+        if model.final_version in target_version:
+            retriebed_models.append(model)
+    return retriebed_models
+
 def main():
     from Model import model_creator
     import version_operator as vo
