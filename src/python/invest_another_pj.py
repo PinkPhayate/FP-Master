@@ -1,4 +1,5 @@
 from ex01_class import Ex01
+from ex02_class import Ex02
 from Model.metrics import Metrics
 import configparser
 from lib import statistic as st
@@ -24,6 +25,11 @@ class Ex01_additional(Ex01):
         training_m = Metrics(model1.final_version, self.METRICS_DIR, model1)
         evaluate_m = Metrics(model2.final_version, self.METRICS_DIR, model2)
         alike_metrics = st.compare_two_versions(training_m, evaluate_m)
+        print(alike_metrics)
+        print(type(alike_metrics))
+        print(training_m.mrg_df[alike_metrics])
+        print(evaluate_m.mrg_df[alike_metrics])
+        raise Exception
         msg = "Sw: {}:{}-{}:{}, alike_metrics: {}"\
             .format(model1.sw_name, model1.final_version, model2.sw_name, model2.final_version, alike_metrics)
         print(msg)
@@ -46,8 +52,11 @@ def main():
 
     models = create_all_models()
     for i,j in combinations(models, 2):
-        ex01 = Ex01_additional(i, METRICS_DIR)
-        ex01.invest_distribution(i, j)
+        # ex01 = Ex01_additional(i, METRICS_DIR)
+        # ex01.invest_distribution(i, j)
+        print(i,j)
+        ex02 = Ex02(i, j, METRICS_DIR)
+        ex02.predict()
 
 if __name__ == '__main__':
     main()

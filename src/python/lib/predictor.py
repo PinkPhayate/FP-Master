@@ -356,11 +356,7 @@ class XGBPredictor(Predictor):
         return model
 
     def train_model(self, ev_data, dv_data):
-        if self.model_type == "ITG":
-            model = self.__get_optimized_model()
-        else:
-            from xgboost import XGBClassifier
-            model = XGBClassifier()
+        model = self.__get_optimized_model()
         model.fit(ev_data, column_or_1d(dv_data))
         return model
 

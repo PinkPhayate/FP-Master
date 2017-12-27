@@ -270,13 +270,20 @@ class AUCAnalyzer(Analyzer):
             return 0, 0, 0
 
         recall = skm.recall_score(y_true=__df[['actual']],
-                                  y_pred=__df[['predict']])
+                                  y_pred=__df[['predict']],
+                                  labels='1',
+                                  average='binary')
+
         accuracy = skm.accuracy_score(y_true=__df[['actual']],
                                       y_pred=__df[['predict']])
         precision = skm.precision_score(y_true=__df[['actual']],
-                                        y_pred=__df[['predict']])
+                                        y_pred=__df[['predict']],
+                                        labels='1',
+                                        average='binary')
         f1 = skm.f1_score(y_true=__df[['actual']],
-                          y_pred=__df[['predict']])
+                          y_pred=__df[['predict']],
+                          labels=1,
+                          average='binary')
         return recall, precision, f1
 
     def calculate_0(self):

@@ -6,9 +6,13 @@ inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
 METRICS_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Metrics'
-config_file = METRICS_DIR + '/exp_config.json'
+config_file = METRICS_DIR
 
-def get_exp_versions():
+def get_exp_versions(exp_num=1):
+    if exp_num ==1:
+        config_file = METRICS_DIR + '/exp_config.json'
+    elif exp_num ==2:
+        config_file = METRICS_DIR + '/exp2_config.json'
     f = open(config_file, 'r')
     jsonData = json.load(f)
     f.close()
@@ -17,9 +21,9 @@ def get_exp_versions():
     return version_datas
 
 
-def get_model_dictionary():
+def get_model_dictionary(exp_num=1):
     """exp_test.pyにテスト書いた"""
-    version_datas = get_exp_versions()
+    version_datas = get_exp_versions(exp_num)
     model_dictionary = {}
     for version_data in version_datas:
         models = []
