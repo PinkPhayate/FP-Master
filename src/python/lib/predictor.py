@@ -127,7 +127,7 @@ class RFPredictor(Predictor):
         super(RFPredictor, self).__init__(pv, v_model, model_type)
 
     def __get_optimized_model(self):
-        param_d = self.ver.param_dictionary
+        param_d = self.predict_ver.param_dictionary
         if param_d is not None:
             model = RandomForestClassifier(
                 oob_score=False,
@@ -139,6 +139,7 @@ class RFPredictor(Predictor):
                 # min_samples_leaf=3
             )
             return model
+        # print('this version {} does not have paramaters file.'.format(self.ver.final_version))
         model = RandomForestClassifier(
             oob_score=False,
             class_weight=None,

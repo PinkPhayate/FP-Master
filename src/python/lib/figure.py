@@ -188,7 +188,7 @@ def create_boxplot_seaborn(df, save_name, title=None):
     hige = ( df['ORG'], df['DST'])
     fig = plt.figure()
     ax = fig.add_subplot(111)
-    ax.set_xticklabels(df.columns)
+    ax.set_xticklabels(['ORG', 'DST'])
 
     bp = ax.boxplot(hige)
 

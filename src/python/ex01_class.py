@@ -74,24 +74,27 @@ class Ex01(object):
         except:
             self.error_logger.error('predict version was different: {}:{}'.format(analyzer_org.predict_version, analyzer_dst.predict_version)); return
 
-        if index == 0:
-            pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy0, analyzer_dst.accum_accuracy0)
-        elif index == 2:
-            pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy2, analyzer_dst.accum_accuracy2)
-        elif index == 3:
-            pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy3, analyzer_dst.accum_accuracy3)
-        else:
-            print('designated index was incollect: {}'.format(index)); return
+        try:
+            if index == 0:
+                pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy0, analyzer_dst.accum_accuracy0)
+            elif index == 2:
+                pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy2, analyzer_dst.accum_accuracy2)
+            elif index == 3:
+                pvalue = st.conduct_m_whitney_test(analyzer_org.accum_accuracy3, analyzer_dst.accum_accuracy3)
+            else:
+                print('designated index was incollect: {}'.format(index)); return
 
-        msg = 'sw: {}, version: {}, p-value{} of mann whitney u test: {}'.format(analyzer_org.target_sw, analyzer_org.predict_version, index, pvalue)
-        self.report_logger.info(msg)
-        print(msg)
+            msg = 'sw: {}, version: {}, p-value{} of mann whitney u test: {}'.format(analyzer_org.target_sw, analyzer_org.predict_version, index, pvalue)
+            self.report_logger.info(msg)
+            # print(msg)
+        except:
+            msg = 'sw: {}, version: {}, index: {} couldnt execute mann whitney u test'.format(analyzer_org.target_sw, analyzer_org.predict_version, index)
 
     def predict(self, box_plotting=True, result_exporting=True):
         self.__get_logger()
         ver, predict_ver = self.model.previous_version, self.model.final_version
         pre_model = mc.retrieve_model(self.model.sw_name, self.model.final_version)
-        predictor_rep = PredictorRepository(predict_ver, self.model)
+        predictor_rep = PredictorRepository(pre_model, self.model)
         training_m = Metrics(ver, self.METRICS_DIR, pre_model)
         evaluate_m = Metrics(predict_ver, self.METRICS_DIR, self.model)
         self.alike_metrics = st.compare_two_versions(training_m, evaluate_m)
@@ -122,10 +125,10 @@ class Ex01(object):
             if predictor is None:
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
                 return
-            sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-            X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
-            # X_resampled, y_resampled = training_m.product_df.as_matrix(),\
-            #     training_m.fault.as_matrix()
+            # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+            # X_resampled, y_resampled = sm.fit_sample( training_m.product_df, training_m.fault )
+            X_resampled, y_resampled = training_m.product_df.as_matrix(),\
+                training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             nml_value, importance = predictor.predict_test_data(model, evaluate_m.product_df, evaluate_m.fault, self.TARGET + "-ex1nml.csv")
             predictor.set_is_new_df(evaluate_m.isNew)
@@ -140,10 +143,10 @@ class Ex01(object):
             predictor = predictor_rep.get_predictor('RFN', self.PRED_TYPE)
             assert predictor is not None,\
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
-            sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-            X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
-            # X_resampled, y_resampled = training_m.mrg_df.as_matrix(),\
-            #     training_m.fault.as_matrix()
+            # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+            # X_resampled, y_resampled = sm.fit_sample( training_m.mrg_df, training_m.fault )
+            X_resampled, y_resampled = training_m.mrg_df.as_matrix(),\
+                training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, self.TARGET + "-ex1rfn.csv")
             predictor.set_is_new_df(evaluate_m.isNew)
@@ -159,10 +162,10 @@ class Ex01(object):
             assert predictor is not None,\
                 print(' predictor has not found, type: ' + self.PRED_TYPE)
             alike_df = training_m.get_specific_df(self.alike_metrics)
-            sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
-            X_resampled, y_resampled = sm.fit_sample(alike_df, training_m.fault)
-            # X_resampled, y_resampled = alike_df.as_matrix(),\
-            #     training_m.fault.as_matrix()
+            # sm = RandomOverSampler(ratio='auto', random_state=random.randint(1,100))
+            # X_resampled, y_resampled = sm.fit_sample(alike_df, training_m.fault)
+            X_resampled, y_resampled = alike_df.as_matrix(),\
+                training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             alike_df = evaluate_m.get_specific_df(self.alike_metrics)
             itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv")

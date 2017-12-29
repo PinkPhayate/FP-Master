@@ -269,21 +269,29 @@ class AUCAnalyzer(Analyzer):
         if __df[['predict']].sum()[0] < 1:
             return 0, 0, 0
 
+        # recall = skm.recall_score(y_true=__df[['actual']],
+        #                           y_pred=__df[['predict']],
+        #                           labels='1',
+        #                           average='binary')
+        #
+        # accuracy = skm.accuracy_score(y_true=__df[['actual']],
+        #                               y_pred=__df[['predict']])
+        # precision = skm.precision_score(y_true=__df[['actual']],
+        #                                 y_pred=__df[['predict']],
+        #                                 labels='1',
+        #                                 average='binary')
+        # f1 = skm.f1_score(y_true=__df[['actual']],
+        #                   y_pred=__df[['predict']],
+        #                   labels=1,
+        #                   average='binary')
         recall = skm.recall_score(y_true=__df[['actual']],
-                                  y_pred=__df[['predict']],
-                                  labels='1',
-                                  average='binary')
-
+                                  y_pred=__df[['predict']])
         accuracy = skm.accuracy_score(y_true=__df[['actual']],
                                       y_pred=__df[['predict']])
         precision = skm.precision_score(y_true=__df[['actual']],
-                                        y_pred=__df[['predict']],
-                                        labels='1',
-                                        average='binary')
+                                        y_pred=__df[['predict']])
         f1 = skm.f1_score(y_true=__df[['actual']],
-                          y_pred=__df[['predict']],
-                          labels=1,
-                          average='binary')
+                          y_pred=__df[['predict']])
         return recall, precision, f1
 
     def calculate_0(self):
