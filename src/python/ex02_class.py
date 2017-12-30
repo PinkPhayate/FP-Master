@@ -44,6 +44,7 @@ class Ex02(Ex01):
         self.TARGET = self.model2.sw_name
 
     def predict(self, box_plotting=False, result_exporting=False):
+        self.model2.set_param_dict(self.PRED_TYPE)
         self.__get_logger()
         # (sw_name, version)を２つ受け取り、それぞれの全てのメトリクスを取得する。
         training_m = Metrics(self.model1.final_version, self.METRICS_DIR, self.model1)

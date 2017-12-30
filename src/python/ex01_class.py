@@ -91,6 +91,7 @@ class Ex01(object):
             msg = 'sw: {}, version: {}, index: {} couldnt execute mann whitney u test'.format(analyzer_org.target_sw, analyzer_org.predict_version, index)
 
     def predict(self, box_plotting=True, result_exporting=True):
+        self.model.set_param_dict(self.PRED_TYPE)
         self.__get_logger()
         ver, predict_ver = self.model.previous_version, self.model.final_version
         pre_model = mc.retrieve_model(self.model.sw_name, self.model.final_version)

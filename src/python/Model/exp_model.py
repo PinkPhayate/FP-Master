@@ -1,6 +1,6 @@
 import configparser
 import json, csv
-
+import os, shutil
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
 ENV = inifile.get('env', 'locale')
@@ -42,7 +42,14 @@ class EXP_MODEL(object):
         version_datas = json.loads(version_data)
         return version_datas
 
-    def set_param_dict(self):
+    def rewrite_param_dict(self, predictor_type):
+        param_dict_name = "{}/paramater_{}.json".format(METRICS_DIR, predictor_type)
+        if os.path.exists(param_dict_name):
+            shutil.copy(param_dict_name, param_file)
+
+    def set_param_dict(self, predictor_type=None):
+        if predictor_type is not None:
+            self.rewrite_param_dict(predictor_type)
         try:
             param_dict = self.__get_param_dict()
         except:
