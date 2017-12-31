@@ -187,6 +187,10 @@ def execute_ex01_prob(model):
     ex01 = Ex01(model, METRICS_DIR)
     ex01.predict_prob()
 
+def count_fp_nums(model):
+    import exported_report_analyzer as era
+    era.measure_prediction_actual_value(model)
+
 def draw_metrics_distribution(model, specific_metrics=None):
     from Model.metrics import Metrics
     from Model import model_creator as mc
@@ -271,9 +275,10 @@ def main():
     config_logger()
     model_dict = model_creator.get_model_dictionary()
     jobs = []
-    # model_dict = retrieb_models(model_dict)
+    model_dict = retrieb_models(model_dict)
     for _, models in model_dict.items():
         for model in models:
+            # count_fp_nums(model)
             """
             ここに実行する実験メソッドを書けば良い
             """
@@ -284,8 +289,10 @@ def main():
             # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
             job = Process(target=execute_ex01, args=(model,))
+            # job = Process(target=execute_ex01_prob, args=(model,))
             # job = Process(target=draw_metrics_distribution, args=(model,))
             # job = Process(target=execute_grid_search, args=(model,))
+            # job = Process(target=count_fp_nums, args=(model,))
             jobs.append(job)
             job.start()
             """
