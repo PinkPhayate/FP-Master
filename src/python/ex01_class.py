@@ -17,7 +17,7 @@ ENV = inifile.get('env', 'locale')
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
     ITER = 100
-    PRED_TYPE = 'xgb'
+    PRED_TYPE = 'rf'
     model = None
     METRICS_DIR = None
     TARGET = None
@@ -149,7 +149,7 @@ class Ex01(object):
             X_resampled, y_resampled = training_m.mrg_df.as_matrix(),\
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
-            rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, self.TARGET + "-ex1rfn.csv")
+            rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, self.TARGET + "-ex1rfn.csv", threshold=0.6)
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
             report_df = predictor.export_report(predict_ver)
@@ -169,7 +169,7 @@ class Ex01(object):
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             alike_df = evaluate_m.get_specific_df(self.alike_metrics)
-            itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv")
+            itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv", threshold=0.6)
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
             report_df = predictor.export_report(predict_ver)
@@ -209,11 +209,13 @@ class Ex01(object):
             itg_analyzer.export_count_report(target_sw=self.TARGET, df=itg_df,
                                              predictor_type=self.PRED_TYPE)
 
-    def predict_prob(self):
+    def predict_prob(self, box_plotting=True, result_exporting=True):
+        self.model.set_param_dict(self.PRED_TYPE)
         self.__get_logger()
         ver, predict_ver = self.model.previous_version, self.model.final_version
-        predictor_rep = PredictorRepository(predict_ver, self.model)
-        training_m = Metrics(ver, self.METRICS_DIR, self.model)
+        pre_model = mc.retrieve_model(self.model.sw_name, self.model.final_version)
+        predictor_rep = PredictorRepository(pre_model, self.model)
+        training_m = Metrics(ver, self.METRICS_DIR, pre_model)
         evaluate_m = Metrics(predict_ver, self.METRICS_DIR, self.model)
         self.alike_metrics = st.compare_two_versions(training_m, evaluate_m)
         msg = "Sw: {}, version: {}, alike_metrics: {}"\
@@ -288,11 +290,11 @@ class Ex01(object):
                 # itg_analyzer.analyze_predict_result()
 
         # export report
-        nml_df = nml_analyzer.calculate_average(self.ITER)
-        rfn_df = rfn_analyzer.calculate_average(self.ITER)
-        itg_df = itg_analyzer.calculate_average(self.ITER)
-        df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True)
-        nml_analyzer.export(target_sw=self.TARGET, df=df, predictor_type=self.PRED_TYPE)    # どのanalyzerクラスでも良い
+        # nml_df = nml_analyzer.calculate_average(self.ITER)
+        # rfn_df = rfn_analyzer.calculate_average(self.ITER)
+        # itg_df = itg_analyzer.calculate_average(self.ITER)
+        # df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True)
+        # nml_analyzer.export(target_sw=self.TARGET, df=df, predictor_type=self.PRED_TYPE)    # どのanalyzerクラスでも良い
 
         # nml_df = nml_analyzer.calculate_num_report_averge(self.ITER)
         # nml_analyzer.export_count_report(target_sw=self.TARGET, df=nml_df,
