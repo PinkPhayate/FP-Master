@@ -16,7 +16,7 @@ ENV = inifile.get('env', 'locale')
 
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
-    ITER = 100
+    ITER = 10
     PRED_TYPE = 'rf'
     model = None
     METRICS_DIR = None
@@ -86,7 +86,7 @@ class Ex01(object):
 
             msg = 'sw: {}, version: {}, p-value{} of mann whitney u test: {}'.format(analyzer_org.target_sw, analyzer_org.predict_version, index, pvalue)
             self.report_logger.info(msg)
-            # print(msg)
+            print(msg)
         except:
             msg = 'sw: {}, version: {}, index: {} couldnt execute mann whitney u test'.format(analyzer_org.target_sw, analyzer_org.predict_version, index)
 
@@ -149,7 +149,7 @@ class Ex01(object):
             X_resampled, y_resampled = training_m.mrg_df.as_matrix(),\
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
-            rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, self.TARGET + "-ex1rfn.csv", threshold=0.6)
+            rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, self.TARGET + "-ex1rfn.csv", threshold=0.5)
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
             report_df = predictor.export_report(predict_ver)
@@ -169,7 +169,7 @@ class Ex01(object):
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             alike_df = evaluate_m.get_specific_df(self.alike_metrics)
-            itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv", threshold=0.6)
+            itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv", threshold=0.5)
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
             report_df = predictor.export_report(predict_ver)
@@ -197,17 +197,18 @@ class Ex01(object):
         df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True)
         nml_analyzer.export(target_sw=self.TARGET, df=df, predictor_type=self.PRED_TYPE)    # どのanalyzerクラスでも良い
 
-        nml_df = nml_analyzer.calculate_num_report_averge(self.ITER)
+        # nml_df = nml_analyzer.calculate_num_report_averge(self.ITER)
         rfn_df = rfn_analyzer.calculate_num_report_averge(self.ITER)
         itg_df = itg_analyzer.calculate_num_report_averge(self.ITER)
 
         if result_exporting:
-            nml_analyzer.export_count_report(target_sw=self.TARGET, df=nml_df,
-                                             predictor_type=self.PRED_TYPE)
+            # nml_analyzer.export_count_report(target_sw=self.TARGET, df=nml_df,
+            #                                  predictor_type=self.PRED_TYPE)
             rfn_analyzer.export_count_report(target_sw=self.TARGET, df=rfn_df,
                                              predictor_type=self.PRED_TYPE)
             itg_analyzer.export_count_report(target_sw=self.TARGET, df=itg_df,
                                              predictor_type=self.PRED_TYPE)
+        return rfn_analyzer, itg_analyzer
 
     def predict_prob(self, box_plotting=True, result_exporting=True):
         self.model.set_param_dict(self.PRED_TYPE)

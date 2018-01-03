@@ -3,6 +3,7 @@ from itertools import combinations
 from itertools import permutations
 import configparser
 from multiprocessing import Process
+from lib import statistic as st
 
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
@@ -26,6 +27,25 @@ def execute_ex02(i, j):
     ex02 = Ex02(i, j, METRICS_DIR)
     ex02.predict()
 
+def conduct_mh_with_another_version(rfn_analyzer_list, itg_analyzer_list):
+    # XXX this module has function only apache derby for version comparing.
+    rfn_analyzer0 = rfn_analyzer_list[0]
+    rfn_analyzer2 = rfn_analyzer_list[2]
+    pvalue = st.conduct_m_whitney_test(rfn_analyzer0.accum_accuracy0, rfn_analyzer2.accum_accuracy0)
+    msg = 'sw: {}, predictv: {}, learnv: 10.10.1.1 p-value of mann whitney u test: {}'\
+        .format(rfn_analyzer0.target_sw,
+                rfn_analyzer0.predict_version,
+                pvalue)
+    print(msg)
+
+    itg_analyzer0 = itg_analyzer_list[0]
+    itg_analyzer2 = itg_analyzer_list[2]
+    pvalue = st.conduct_m_whitney_test(itg_analyzer0.accum_accuracy0, itg_analyzer2.accum_accuracy0)
+    msg = 'sw: {}, predictv: {}, learnv: 10.10.1.1 p-value of mann whitney u test: {}'\
+        .format(itg_analyzer0.target_sw,
+                itg_analyzer0.predict_version,
+                pvalue)
+    print(msg)
 
 def main():
     models = __create_all_models()
@@ -52,6 +72,8 @@ def _main():
     import exp_execution as ex1
     model_dict = model_creator.get_model_dictionary(exp_num=2)
     jobs = []
+    rfn_analyzer_list = []
+    itg_analyzer_list = []
     # model_dict = retrieb_models(model_dict)
     for _, models in model_dict.items():
         # models = retrieb_model_specified_version(models)
@@ -59,11 +81,17 @@ def _main():
             """
             ここに実行する実験メソッドを書けば良い
             """
-            print(model.sw_name, model.final_version, model.previous_version)
-            ex1.execute_ex01(model)
             # job = Process(target=ex1.execute_ex01, args=(model,))
             # jobs.append(job)
             # job.start()
+            if model.previous_version == '':
+                continue
+
+            print(model.sw_name, model.final_version, model.previous_version)
+            rfn_analyzer, itg_analyzer = ex1.execute_ex01(model)
+            rfn_analyzer_list.append(rfn_analyzer)
+            itg_analyzer_list.append(itg_analyzer)
+        conduct_mh_with_another_version(rfn_analyzer_list, itg_analyzer_list)
     # [jb.join() for jb in jobs]
 
 if __name__ == '__main__':

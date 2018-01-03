@@ -175,7 +175,7 @@ def execute_ex01(model):
     report_logger.info('sw name: {}, predict version: {}, previousversion: {}'
         .format(model.sw_name, model.final_version, model.previous_version))
     ex01 = Ex01(model, METRICS_DIR)
-    ex01.predict()
+    return ex01.predict()
 
 def execute_ex01_prob(model):
     from ex01_class import Ex01
