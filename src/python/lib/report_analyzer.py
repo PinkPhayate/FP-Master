@@ -204,8 +204,9 @@ class AUCAnalyzer(Analyzer):
     accum_fp_num_modified = []
     accum_corrct_num_modified = []
 
-    def __init__(self, version, model_type, target_sw):
-        self.predict_version = version
+    def __init__(self, predict_version, learning_version, model_type, target_sw):
+        self.predict_version = predict_version
+        self.learning_version = learning_version
         self.model_type = model_type
         self.target_sw = target_sw
         self.report_file_name = REPORT_DIR + target_sw+'-aucreport.csv'

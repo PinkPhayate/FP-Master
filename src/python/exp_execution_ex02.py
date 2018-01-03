@@ -4,6 +4,8 @@ from itertools import permutations
 import configparser
 from multiprocessing import Process
 from lib import statistic as st
+from lib import figure
+import pandas as pd
 
 inifile = configparser.SafeConfigParser()
 inifile.read('./config.ini')
@@ -32,20 +34,44 @@ def conduct_mh_with_another_version(rfn_analyzer_list, itg_analyzer_list):
     rfn_analyzer0 = rfn_analyzer_list[0]
     rfn_analyzer2 = rfn_analyzer_list[2]
     pvalue = st.conduct_m_whitney_test(rfn_analyzer0.accum_accuracy0, rfn_analyzer2.accum_accuracy0)
-    msg = 'sw: {}, predictv: {}, learnv: 10.10.1.1 p-value of mann whitney u test: {}'\
+    msg = 'sw: {}_rfn, predictv: {}, learnv: {} p-value of mann whitney u test: {}'\
         .format(rfn_analyzer0.target_sw,
                 rfn_analyzer0.predict_version,
+                rfn_analyzer0.learning_version,
                 pvalue)
     print(msg)
 
     itg_analyzer0 = itg_analyzer_list[0]
     itg_analyzer2 = itg_analyzer_list[2]
-    pvalue = st.conduct_m_whitney_test(itg_analyzer0.accum_accuracy0, itg_analyzer2.accum_accuracy0)
-    msg = 'sw: {}, predictv: {}, learnv: 10.10.1.1 p-value of mann whitney u test: {}'\
+    pvalue = st.conduct_m_whitney_test(itg_analyzer0.accum_accuracy0,
+                                       itg_analyzer2.accum_accuracy0)
+    msg = 'sw: {}_itg, predictv: {}, learnv: {} p-value of mann whitney u test: {}'\
         .format(itg_analyzer0.target_sw,
                 itg_analyzer0.predict_version,
+                itg_analyzer0.learning_version,
                 pvalue)
     print(msg)
+
+def draw_result_boxplot(AUCAnalyzerA, AUCAnalyzerB):
+    REPORT_DIR = '/Users/'+ENV+'/Dropbox/STUDY/Result2/figure/'
+    figure_name = '{}/result_wisky({}-{})^{}.png'\
+        .format(REPORT_DIR, AUCAnalyzerA.learning_version,
+                AUCAnalyzerB.learning_version, AUCAnalyzerA.model_type)
+    g0 = pd.DataFrame([AUCAnalyzerA.accum_accuracy0]).T
+    g2 = pd.DataFrame([AUCAnalyzerB.accum_accuracy0]).T
+
+    g0.columns = [AUCAnalyzerA.learning_version]
+    g2.columns = [AUCAnalyzerB.learning_version]
+    hige = pd.concat([g0, g2], axis=1)
+    figure.create_boxplot_seaborn(hige, figure_name)
+
+def draw_result_boxplots(rfn_analyzer_list, itg_analyzer_list):
+    rfn_analyzer0 = rfn_analyzer_list[0]
+    rfn_analyzer2 = rfn_analyzer_list[2]
+    draw_result_boxplot(rfn_analyzer0, rfn_analyzer2)
+    itg_analyzer0 = itg_analyzer_list[0]
+    itg_analyzer2 = itg_analyzer_list[2]
+    draw_result_boxplot(itg_analyzer0, itg_analyzer2)
 
 def main():
     models = __create_all_models()
@@ -92,6 +118,7 @@ def _main():
             rfn_analyzer_list.append(rfn_analyzer)
             itg_analyzer_list.append(itg_analyzer)
         conduct_mh_with_another_version(rfn_analyzer_list, itg_analyzer_list)
+        draw_result_boxplots(rfn_analyzer_list, itg_analyzer_list)
     # [jb.join() for jb in jobs]
 
 if __name__ == '__main__':

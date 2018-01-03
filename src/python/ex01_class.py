@@ -16,7 +16,7 @@ ENV = inifile.get('env', 'locale')
 
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
-    ITER = 10
+    ITER = 100
     PRED_TYPE = 'rf'
     model = None
     METRICS_DIR = None
@@ -107,9 +107,18 @@ class Ex01(object):
             self.error_logger.error('could not create AUCAnalyzer instance.\
             predict_ver: {}, target: {}'.format(predict_ver, self.TARGET))
             return
-        nml_analyzer = AUCAnalyzer(predict_ver, 'NML', self.TARGET)
-        rfn_analyzer = AUCAnalyzer(predict_ver, 'RFN', self.TARGET)
-        itg_analyzer = AUCAnalyzer(predict_ver, 'ITG', self.TARGET)
+        nml_analyzer = AUCAnalyzer(predict_version=predict_ver,
+                                   learning_version=ver,
+                                   model_type='NML',
+                                   target_sw=self.TARGET)
+        rfn_analyzer = AUCAnalyzer(predict_version=predict_ver,
+                                   learning_version=ver,
+                                   model_type='RFN',
+                                   target_sw=self.TARGET)
+        itg_analyzer = AUCAnalyzer(predict_version=predict_ver,
+                                   learning_version=ver,
+                                   model_type='ITG',
+                                   target_sw=self.TARGET)
         # nml_analyzer = Analyzer(predict_ver, 'NML')
         # rfn_analyzer = Analyzer(predict_ver, 'RFN')
         # itg_analyzer = Analyzer(predict_ver, 'ITG')

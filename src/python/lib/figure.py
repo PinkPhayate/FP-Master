@@ -185,7 +185,8 @@ def draw_histgram(data1, data2, fileName):
 #     plt.savefig(save_name)
 def create_boxplot_seaborn(df, save_name, title=None):
     # create graph just one version
-    hige = ( df['ORG'], df['DST'])
+    hige = (df.ix[:, 0], df.ix[:, 1])
+    # hige = ( df['ORG'], df['DST'])
     fig = plt.figure()
     ax = fig.add_subplot(111)
     ax.set_xticklabels(['ORG', 'DST'])
