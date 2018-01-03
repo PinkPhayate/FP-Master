@@ -55,3 +55,11 @@ def get_pdt_prs_merge_stub():
                       cv=None,
                       dn='ApacheVelocity')
     return model
+
+def get_Metrics_model():
+    from Model.metrics import Metrics
+    predict_model = get_hive_model()
+    predict_ver = predict_model.final_version
+    METRICS_DIR = '/Users/kishi-lab/Dropbox/STUDY/Metrics'
+    training_m = Metrics(predict_ver, METRICS_DIR, predict_model)
+    return training_m
