@@ -278,7 +278,7 @@ def main():
     model_dict = retrieb_models(model_dict)
     for _, models in model_dict.items():
         for model in models:
-            # count_fp_nums(model)
+            count_fp_nums(model)
             """
             ここに実行する実験メソッドを書けば良い
             """
@@ -289,16 +289,15 @@ def main():
             # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
             # job = Process(target=execute_ex01, args=(model,))
-            job = Process(target=execute_ex01_prob, args=(model,))
+            # job = Process(target=execute_ex01_prob, args=(model,))
             # job = Process(target=draw_metrics_distribution, args=(model,))
             # job = Process(target=execute_grid_search, args=(model,))
-            # job = Process(target=count_fp_nums, args=(model,))
-            jobs.append(job)
-            job.start()
+            # jobs.append(job)
+            # job.start()
             """
             このインデントを維持する。
             """
-    [jb.join() for jb in jobs]
+    # [jb.join() for jb in jobs]
 
 
 if __name__ == '__main__':

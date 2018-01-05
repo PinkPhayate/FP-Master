@@ -25,10 +25,13 @@ def measure_prediction_actual_value(model):
     # 確率別の予測数
     fault_df = df[df['actual'].apply(lambda x: x == 1)]
     # predicts = df[['predict']]
-    prob_list = [0.9, 0.8, 0.7, 0.6, 0.5]
+    prob_list = [0.9, 0.8, 0.7, 0.6, 0.5, 0.4, 0.3, 0.2, 0.1, 0.0]
     for p in prob_list:
         # print('fp count / probabilities', end='')
         fp_num = __count_specified_area(df, p)
         # print('corrected fp count / probabilities', end='')
         tf_num = __count_specified_area(fault_df, p)
-        print('probability{}: precision: {} ({}/{})'.format(p, float(tf_num)/fp_num, tf_num, fp_num))
+        if fp_num==0:
+            print('probability{}: precision: 0 ({}/{})'.format(p, tf_num, fp_num))
+        else:
+            print('probability{}: precision: {} ({}/{})'.format(p, float(tf_num)/fp_num, tf_num, fp_num))
