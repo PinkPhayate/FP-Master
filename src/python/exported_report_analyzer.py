@@ -31,4 +31,7 @@ def measure_prediction_actual_value(model):
         fp_num = __count_specified_area(df, p)
         # print('corrected fp count / probabilities', end='')
         tf_num = __count_specified_area(fault_df, p)
-        print('probability{}: precision: {} ({}/{})'.format(p, float(tf_num)/fp_num, tf_num, fp_num))
+        if fp_num==0:
+            print('probability{}: precision: ??? ({}/{})'.format(p, tf_num, fp_num))
+        else:
+            print('probability{}: precision: {} ({}/{})'.format(p, float(tf_num)/fp_num, tf_num, fp_num))
