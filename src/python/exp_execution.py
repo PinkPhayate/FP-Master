@@ -254,7 +254,7 @@ def restrict_models(model_dict):
     return model_dict_copy
 
 def retrieb_models(model_dict):
-    target_array = ['derby']
+    target_array = ['solr']
     model_dict_copy = model_dict.copy()
     for version in model_dict.keys():
         if version not in target_array:
@@ -288,8 +288,8 @@ def main():
             # job = Process(target=merge_process_bug, args=(model,))
             # job = Process(target=merge_process_bug_derby, args=(model,))
             # job = Process(target=merge_process_product, args=(model,))
-            job = Process(target=execute_ex01, args=(model,))
-            # job = Process(target=execute_ex01_prob, args=(model,))
+            # job = Process(target=execute_ex01, args=(model,))
+            job = Process(target=execute_ex01_prob, args=(model,))
             # job = Process(target=draw_metrics_distribution, args=(model,))
             # job = Process(target=execute_grid_search, args=(model,))
             # job = Process(target=count_fp_nums, args=(model,))

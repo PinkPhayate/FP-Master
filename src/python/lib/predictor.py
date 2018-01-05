@@ -169,8 +169,9 @@ class RFPredictor(Predictor):
         # ev_data = pd.concat([paramater, dv_data],axis=1)
         predict = pd.DataFrame(output).ix[:,1:]
         predict.columns = [['predict']]
-        p = predict.apply(lambda x: 1 if x[['predict']].values[0]> 0.5 else 0, axis=1)
-        df = pd.concat([paramater, p],axis=1)
+        # p = predict.apply(lambda x: 1 if x[['predict']].values[0]> 0.5 else 0, axis=1)
+        # df = pd.concat([paramater, p],axis=1)
+        df = pd.concat([paramater, predict],axis=1)
         dv_data.columns = [['actual']]
         df = pd.concat([df, dv_data.to_frame(name='actual')],axis=1)
         df.loc[:, 'predict'] = df.apply(lambda x: float(x['predict']), axis=1)
