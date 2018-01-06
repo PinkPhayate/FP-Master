@@ -387,7 +387,7 @@ class XGBPredictor(Predictor):
         self.report_df = df
 
         return self.calculate_auc_score(dv_data, predict),\
-                                            model.feature_importances_
+                                            None
 
     def predict_test_data(self, model, ev_data, dv_data, filename):
         # save for write file about metrics and predict and actualy

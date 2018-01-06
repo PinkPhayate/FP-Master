@@ -278,26 +278,14 @@ def main():
     model_dict = retrieb_models(model_dict)
     for _, models in model_dict.items():
         for model in models:
-            count_fp_nums(model)
+            # count_fp_nums(model)
             """
             ここに実行する実験メソッドを書けば良い
             """
-            # vo.adjust_bug_list(model)
-            # job = Process(target=exe_DIMA, args=(model,))
-            # job = Process(target=retrieb_bug_list, args=(model,))
-            # job = Process(target=merge_process_bug, args=(model,))
-            # job = Process(target=merge_process_bug_derby, args=(model,))
-            # job = Process(target=merge_process_product, args=(model,))
-            # job = Process(target=execute_ex01, args=(model,))
-            # job = Process(target=execute_ex01_prob, args=(model,))
-            # job = Process(target=draw_metrics_distribution, args=(model,))
-            # job = Process(target=execute_grid_search, args=(model,))
-            # jobs.append(job)
-            # job.start()
-            """
-            このインデントを維持する。
-            """
-    # [jb.join() for jb in jobs]
+            job = Process(target=execute_ex01_prob, args=(model,))
+            jobs.append(job)
+            job.start()
+    [jb.join() for jb in jobs]
 
 
 if __name__ == '__main__':
