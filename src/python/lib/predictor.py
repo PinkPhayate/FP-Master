@@ -388,17 +388,24 @@ class XGBPredictor(Predictor):
         return self.calculate_auc_score(dv_data, predict),\
                                             model.feature_importances_
 
-    def predict_test_data(self, model, ev_data, dv_data, filename):
+    def predict_test_data(self, model, ev_data, dv_data, filename, threshold=0.5):
         # save for write file about metrics and predict and actualy
         paramater = ev_data.copy()
         # normalize
         # ev_data = (ev_data - ev_data.mean()) / ev_data.std()
-        output = model.predict(ev_data)
+
+        # output = model.predict(ev_data)
+        output = model.predict_proba(ev_data)
+
 
         # ev_data = pd.concat([paramater, dv_data],axis=1)
-        predict = pd.DataFrame(output)
+        # predict = pd.DataFrame(output)
+        predict = pd.DataFrame(output).ix[:,1:]
         predict.columns = [['predict']]
-        df = pd.concat([paramater, predict], axis=1)
+        p = predict.apply(lambda x: 1 if x[['predict']].values[0] > threshold else 0, axis=1)
+        p = pd.DataFrame(p)
+        p.columns = [['predict']]
+        df = pd.concat([paramater, p], axis=1)
         dv_data.columns = [['actual']]
         df = pd.concat([df, dv_data.to_frame(name='actual')], axis=1)
         self.report_df = df
