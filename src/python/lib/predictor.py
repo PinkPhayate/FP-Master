@@ -67,7 +67,7 @@ class Predictor(object):
             if sorting:
                 self.report_df = self.report_df.sort_values(by='predict', ascending=False)
             if EXECUTION_MODE == 'logging':
-                self.report_df.to_csv(METRICS_DIR+version+self.model_type+'-report.csv')
+                self.report_df.to_csv(METRICS_DIR+version+self.model.previous_version + self.model_type+'-report.csv')
             return self.report_df
 
     def predict_test_data(self, model, ev_data, dv_data, filename):

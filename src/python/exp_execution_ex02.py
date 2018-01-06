@@ -60,7 +60,10 @@ def _main():
             ここに実行する実験メソッドを書けば良い
             """
             print(model.sw_name, model.final_version, model.previous_version)
-            ex1.execute_ex01(model)
+            # ex1.execute_ex01(model)
+            ex1.execute_ex01_prob(model)
+            ex1.count_fp_numsv(model)
+
             # job = Process(target=ex1.execute_ex01, args=(model,))
             # jobs.append(job)
             # job.start()
