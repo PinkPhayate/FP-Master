@@ -17,7 +17,7 @@ ENV = inifile.get('env', 'locale')
 class Ex01(object):
     REPORT_COLUMNS = ['predict', 'actual', 'isNew', 'isModified']
     ITER = 100
-    PRED_TYPE = 'xgb'
+    PRED_TYPE = 'rf'
     model = None
     METRICS_DIR = None
     TARGET = None
@@ -149,7 +149,7 @@ class Ex01(object):
             X_resampled, y_resampled = training_m.mrg_df.as_matrix(),\
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
-            rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, self.TARGET + "-ex1rfn.csv", threshold=0.6)
+            rfn_value, importance = predictor.predict_test_data(model, evaluate_m.mrg_df, evaluate_m.fault, self.TARGET + "-ex1rfn.csv", threshold=0.5)
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
             report_df = predictor.export_report(predict_ver)
@@ -169,7 +169,7 @@ class Ex01(object):
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             alike_df = evaluate_m.get_specific_df(self.alike_metrics)
-            itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv", threshold=0.6)
+            itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv", threshold=0.4)
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
             report_df = predictor.export_report(predict_ver)
@@ -202,8 +202,8 @@ class Ex01(object):
         itg_df = itg_analyzer.calculate_num_report_averge(self.ITER)
 
         if result_exporting:
-            nml_analyzer.export_count_report(target_sw=self.TARGET, df=nml_df,
-                                             predictor_type=self.PRED_TYPE)
+            # nml_analyzer.export_count_report(target_sw=self.TARGET, df=nml_df,
+            #                                  predictor_type=self.PRED_TYPE)
             rfn_analyzer.export_count_report(target_sw=self.TARGET, df=rfn_df,
                                              predictor_type=self.PRED_TYPE)
             itg_analyzer.export_count_report(target_sw=self.TARGET, df=itg_df,
