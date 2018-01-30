@@ -29,6 +29,7 @@ class Ex01(object):
         self.model = model
         self.TARGET = model.sw_name
         self.METRICS_DIR = METRICS_DIR
+        self.__retrieb_opt_predictor()
 
     def __get_logger(self):
         inifile = configparser.SafeConfigParser()
@@ -37,6 +38,8 @@ class Ex01(object):
         logger = 'debug' if mode == 'debug' else 'report'
         self.report_logger, self.error_logger = getLogger(logger+"_log"), getLogger("error_log")
 
+    def __retrieb_opt_predictor(self):
+        self.PRED_TYPE = "xgb" if self.model.sw_name == 'solr' else "rf"
 
     def draw_result_boxplot(self, analyzer_org, analyzer_dst, index=0):
         from lib import figure
@@ -169,7 +172,7 @@ class Ex01(object):
                 training_m.fault.as_matrix()
             model = predictor.train_model(X_resampled, y_resampled)
             alike_df = evaluate_m.get_specific_df(self.alike_metrics)
-            itg_value, importance = predictor.predict_test_data(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv", threshold=0.4)
+            itg_value, importance = predictor.predict_test_data_(model, alike_df, evaluate_m.fault, self.TARGET + "-ex1itg.csv", threshold=0.5)
             predictor.set_is_new_df(evaluate_m.isNew)
             predictor.set_is_modified_df(evaluate_m.isModified)
             report_df = predictor.export_report(predict_ver)
@@ -197,7 +200,7 @@ class Ex01(object):
         df = pd.concat([nml_df, rfn_df, itg_df], ignore_index=True)
         nml_analyzer.export(target_sw=self.TARGET, df=df, predictor_type=self.PRED_TYPE)    # どのanalyzerクラスでも良い
 
-        nml_df = nml_analyzer.calculate_num_report_averge(self.ITER)
+        # nml_df = nml_analyzer.calculate_num_report_averge(self.ITER)
         rfn_df = rfn_analyzer.calculate_num_report_averge(self.ITER)
         itg_df = itg_analyzer.calculate_num_report_averge(self.ITER)
 

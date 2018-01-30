@@ -126,6 +126,9 @@ class RFPredictor(Predictor):
     def __init__(self, pv, v_model, model_type):
         super(RFPredictor, self).__init__(pv, v_model, model_type)
 
+    def predict_test_data_(self, model, ev_data, dv_data, filename, threshold=0.5):
+        return self.predict_test_data(model, ev_data, dv_data, filename, 0.5)
+
     def __get_optimized_model(self):
         param_d = self.predict_ver.param_dictionary
         if param_d is not None:
@@ -349,6 +352,9 @@ class BoostingPredictor(Predictor):
 class XGBPredictor(Predictor):
     def __init__(self, pv, v_model, model_type):
         super(XGBPredictor, self).__init__(pv, v_model, model_type)
+
+    def predict_test_data_(self, model, ev_data, dv_data, filename, threshold=0.5):
+        return self.predict_test_data(model, ev_data, dv_data, filename, 0.5)
 
     def __get_optimized_model(self):
         from xgboost import XGBClassifier
